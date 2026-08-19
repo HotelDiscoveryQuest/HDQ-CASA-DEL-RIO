@@ -1216,7 +1216,7 @@ CHANCE CARD
 =========================================
 */
 
-if (qrCardType === 'C') {
+if (cardType === 'C') {
   showChanceCard()
   return
 }
@@ -1227,7 +1227,7 @@ PENALTY CARD
 =========================================
 */
 
-if (qrCardType === 'P') {
+if (cardType === 'P') {
   showPenaltyCard()
   return
 }
@@ -1238,7 +1238,7 @@ OPEN QUESTION IMMEDIATELY
 =========================================
 */
 
-if (type === 'A') {
+if (cardType === 'A') {
 
   const question =
     getRandomQuestionForCard('A')
@@ -1255,7 +1255,7 @@ if (type === 'A') {
   return
 }
 
-if (type === 'G') {
+if (cardType === 'G') {
 
   const question =
     getRandomQuestionForCard('G')
@@ -1272,7 +1272,7 @@ if (type === 'G') {
   return
 }
 
-if (type === 'D') {
+if (cardType === 'D') {
 
   const question =
     getRandomQuestionForCard('D')
@@ -1289,12 +1289,12 @@ if (type === 'D') {
   return
 }
 
-if (type === 'C') {
+if (cardType === 'C') {
   showChanceCard()
   return
 }
 
-if (type === 'P') {
+if (cardType === 'P') {
   showPenaltyCard()
   return
 }
@@ -2105,15 +2105,15 @@ function getRandomQuestionForCard(
 ) {
   let questions: Question[] = []
 
-  if (type === 'A') {
+  if (cardType === 'A') {
     questions = attractionQuestions
   }
 
-  if (type === 'G') {
+  if (cardType === 'G') {
     questions = challengeQuestions
   }
 
-  if (type === 'D') {
+  if (cardType === 'D') {
     questions = discoveryQuestions
   }
 
@@ -2295,10 +2295,10 @@ setSelectedCard(cardType)
   =========================================
   */
 
-  if (qrCardType === 'C') {
-    showChanceCard()
-    return
-  }
+  if (cardType === 'C') {
+  showChanceCard()
+  return
+}
 
   /*
   =========================================
@@ -2306,10 +2306,10 @@ setSelectedCard(cardType)
   =========================================
   */
 
-  if (qrCardType === 'P') {
-    showPenaltyCard()
-    return
-  }
+if (cardType === 'P') {
+  showPenaltyCard()
+  return
+}
 }
 
   /*
