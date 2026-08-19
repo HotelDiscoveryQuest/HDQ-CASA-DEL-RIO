@@ -85,7 +85,6 @@ type BoardSpace = {
 type Question = {
   id: number
   level: number
-  difficulty: Difficulty
   question: string
   answers: string[]
   points: number
@@ -150,9 +149,12 @@ function App() {
 
 const [screen, setScreen] =
   useState<Screen>('home')
+  const [cardToScan, setCardToScan] =
+  useState<string | null>(null)
 
   const [gameId, setGameId] = useState('')
-  
+  const [continueId, setContinueId] = useState('')
+
   // QR card detected from physical card
   const [qrCardType, setQrCardType] =
   useState<CardType | 'START' | null>(null)
@@ -197,6 +199,9 @@ const [rewardClaimed, setRewardClaimed] =
 
   const [round, setRound] = useState(1)
 
+  const [selectedCard, setSelectedCard] =
+    useState<CardType | null>(null)
+
   const [currentQuestion, setCurrentQuestion] =
     useState<Question | null>(null)
 
@@ -205,8 +210,7 @@ const [rewardClaimed, setRewardClaimed] =
   const [timeLeft, setTimeLeft] = useState(30)
 
   const [cardNumber, setCardNumber] = useState(0)
-    const [showContinueChoice, setShowContinueChoice] =
-  useState(false)
+
 
   /*
   =========================================
@@ -1156,43 +1160,28 @@ P1
 =========================================
 */
 
-/*
-=========================================
-CHECK PHYSICAL CARD
-=========================================
-*/
+const match =
+  cardId.match(
+    /^(A|G|D|C|P)(\d+)$/
+  )
 
-const physicalCard = physicalCards.find(
-  card => card.id === cardId
-)
-
-if (!physicalCard) {
+if (!match) {
   alert(
-    `❌ Invalid card.\n\n` +
+    `❌ Invalid card number.\n\n` +
     `Scanned card: ${cardId}\n\n` +
-    `This card is not registered in Hotel Discovery Quest.`
+    `Example valid cards:\n` +
+    `A1, A2, G1, D1, C1, P1`
   )
 
   return
 }
 
-const cardType = physicalCard.type
-const cardNumber = physicalCard.number
+const cardType =
+  match[1] as CardType
 
-console.log(
-  'PHYSICAL CARD:',
-  physicalCard
-)
+const cardNumber =
+  Number(match[2])
 
-console.log(
-  'CARD TYPE:',
-  cardType
-)
-
-console.log(
-  'CARD NUMBER:',
-  cardNumber
-)
 console.log(
   'CARD TYPE:',
   cardType
@@ -1210,6 +1199,7 @@ CARD SCANNED SUCCESSFULLY
 */
 
 setCardNumber(cardNumber)
+setSelectedCard(cardType)
 setAnswer('')
 
 
@@ -1267,15 +1257,15 @@ if (
   =========================================
   */
 
-  if (qrCardType === 'A') {
+  if (cardType === 'A') {
     setScreen('question')
   }
 
-  if (qrCardType === 'G') {
+  if (cardType === 'G') {
     setScreen('challenge')
   }
 
-  if (qrCardType === 'D') {
+  if (cardType === 'D') {
     setScreen('discovery')
   }
 
@@ -1288,7 +1278,7 @@ CHANCE CARD
 =========================================
 */
 
-if (qrCardType === 'C') {
+if (cardType === 'C') {
   showChanceCard()
   return
 }
@@ -1299,7 +1289,7 @@ PENALTY CARD
 =========================================
 */
 
-if (qrCardType === 'P') {
+if (cardType === 'P') {
   showPenaltyCard()
   return
 }
@@ -1654,15 +1644,6 @@ async function saveGameToSupabase(
 
   return true
 }
- function generateRewardCode() {
-  return (
-    'HDQ-' +
-    Math.random()
-      .toString(36)
-      .substring(2, 8)
-      .toUpperCase()
-  )
-}
 
   /*
   =========================================
@@ -1670,6 +1651,7 @@ async function saveGameToSupabase(
   =========================================
   */
   async function startGame() {
+    console.log('START GAME CLICKED')
     const cleanNames = playerNames.map(name =>
       name.trim().toLowerCase()
     )
@@ -1841,7 +1823,7 @@ async function saveGameToSupabase(
     CREATE NEW GAME
     =========================================
     */
-  
+    console.log('PASSED PLAYER CHECKS')
     const newGameId =
       'HQ-' +
       Math.floor(
@@ -1896,20 +1878,26 @@ async function saveGameToSupabase(
       JSON.stringify(gameData)
     )
   
-    await saveGameToSupabase(
-      newGameId,
-      pointMode,
-      newPlayerData,
-      1
-    )
-  
-    cleanNames.forEach(name => {
+    // Save to Supabase without blocking the game
+saveGameToSupabase(
+  newGameId,
+  pointMode,
+  newPlayerData,
+  1
+).catch(error => {
+  console.error(
+    'Supabase save failed:',
+    error
+  )
+})
+
+cleanNames.forEach(name => {
       localStorage.setItem(
         `hotelDiscoveryQuest_name_${name}`,
         newGameId
       )
     })
-  
+    console.log('GOING TO BOARD')
     setScreen('board')
   
     alert(
@@ -2188,25 +2176,21 @@ function getQuestionForCard(
     return null
   }
 
-  // Get the difficulty based on the current game level
-
-  // Find questions for this difficulty
-  const levelQuestions = questions.filter(
-    question => question.level === level
+  // Try to get the exact question number
+  const exact = questions.find(
+    question => question.id === number
   )
 
-  // If there are no questions for this level,
-  // use all questions as a fallback
-  const availableQuestions =
-    levelQuestions.length > 0
-      ? levelQuestions
-      : questions
+  if (exact) {
+    return exact
+  }
 
-  // Use the physical card number to select a question
+  // If card number is outside the question list,
+  // cycle back through the questions
   const index =
-    Math.abs(number - 1) % availableQuestions.length
+    Math.abs(number - 1) % questions.length
 
-  return availableQuestions[index]
+  return questions[index]
 }
 
 
@@ -2271,11 +2255,11 @@ function getRandomQuestionForCard(
   =========================================
   */
 
- const levelQuestions =
-  questions.filter(
-    question =>
-      getDifficulty(question.level) === difficulty
-  )
+  const levelQuestions =
+    questions.filter(
+      question =>
+        question.difficulty === difficulty
+    )
 
   /*
   =========================================
