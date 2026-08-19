@@ -12,13 +12,6 @@ function getLevelPoints(level: number): number {
   return 10
 }
 
-type CardId = {
-  id: string
-  type: CardType
-  number: number
-  name: string
-}
-
 type BoardSpace = {
   position: number
   name: string
