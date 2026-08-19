@@ -85,6 +85,7 @@ type BoardSpace = {
 type Question = {
   id: number
   level: number
+  difficulty?: Difficulty
   question: string
   answers: string[]
   points: number
@@ -1262,15 +1263,15 @@ if (
   =========================================
   */
 
-  if (cardType === 'A') {
+  if (type === 'A') {
     setScreen('question')
   }
 
-  if (cardType === 'G') {
+  if (type === 'G') {
     setScreen('challenge')
   }
 
-  if (cardType === 'D') {
+  if (type === 'D') {
     setScreen('discovery')
   }
 
@@ -1283,7 +1284,7 @@ CHANCE CARD
 =========================================
 */
 
-if (cardType === 'C') {
+if (type === 'C') {
   showChanceCard()
   return
 }
@@ -1294,7 +1295,7 @@ PENALTY CARD
 =========================================
 */
 
-if (cardType === 'P') {
+if (type === 'P') {
   showPenaltyCard()
   return
 }
