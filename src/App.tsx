@@ -3207,7 +3207,6 @@ function finishCard() {
     </div>
   )
 }
- can you tell me delete only what part
 
 <hr />
           
