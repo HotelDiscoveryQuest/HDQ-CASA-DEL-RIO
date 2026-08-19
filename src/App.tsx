@@ -1182,7 +1182,7 @@ if (
   cardType === 'D'
 ) {
   const question =
-    getRandomQuestionForCard(type)
+    getRandomQuestionForCard(cardType)
 
   if (!question) {
     alert(
@@ -1195,21 +1195,15 @@ if (
 
   setTimeLeft(question.time)
 
-  /*
-  =========================================
-  SHOW QUESTION
-  =========================================
-  */
-
-  if (qrCardType === 'A') {
+  if (cardType === 'A') {
     setScreen('question')
   }
 
-  if (qrCardType === 'G') {
+  if (cardType === 'G') {
     setScreen('challenge')
   }
 
-  if (qrCardType === 'D') {
+  if (cardType === 'D') {
     setScreen('discovery')
   }
 
