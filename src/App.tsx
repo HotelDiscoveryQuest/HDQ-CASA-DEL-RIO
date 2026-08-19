@@ -5,11 +5,6 @@ import './App.css'
 
 type CardType = 'C' | 'D' | 'G' | 'A' | 'P'
 type Difficulty = 'Easy' | 'Medium' | 'Hard'
-function getDifficulty(level: number): Difficulty {
-  if (level === 1) return 'Easy'
-  if (level === 2) return 'Medium'
-  return 'Hard'
-}
 
 function getLevelPoints(level: number): number {
   if (level === 1) return 3
