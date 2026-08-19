@@ -1086,21 +1086,6 @@ if (!cardId) {
 =========================================
 CHECK CARD FORMAT
 =========================================
-
-A = Attraction
-G = Challenge
-D = Discovery
-C = Chance
-P = Penalty
-
-Examples:
-A1
-A2
-G1
-D1
-C1
-P1
-=========================================
 */
 
 const match =
@@ -1135,6 +1120,77 @@ console.log(
   cardNumber
 )
 
+setCardNumber(cardNumber)
+setSelectedCard(cardType)
+setAnswer('')
+setQrCardType(cardType)
+
+await scanner.stop()
+
+setShowScanner(false)
+
+if (
+  cardType === 'A' ||
+  cardType === 'G' ||
+  cardType === 'D'
+) {
+  const question =
+    getRandomQuestionForCard(cardType)
+
+  if (!question) {
+    alert(
+      '⚠️ No question found for this card.'
+    )
+    return
+  }
+
+  setCurrentQuestion(question)
+  setTimeLeft(question.time)
+
+  if (cardType === 'A') {
+    setScreen('question')
+  }
+
+  if (cardType === 'G') {
+    setScreen('challenge')
+  }
+
+  if (cardType === 'D') {
+    setScreen('discovery')
+  }
+
+  return
+}
+
+if (cardType === 'C') {
+  showChanceCard()
+  return
+}
+
+if (cardType === 'P') {
+  showPenaltyCard()
+  return
+}
+
+},
+() => {
+  // Ignore normal camera scanning errors
+}
+).catch(() => {
+  alert(
+    '⚠️ Camera could not be opened. Please allow camera permission.'
+  )
+
+  setShowScanner(false)
+})
+
+return () => {
+  scanner
+    .stop()
+    .catch(() => {})
+}
+}, [showScanner])
+      
 /*
 =========================================
 CARD SCANNED SUCCESSFULLY
