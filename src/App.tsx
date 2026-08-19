@@ -3161,7 +3161,7 @@ function finishCard() {
     <p>
       🎴 Card Type: {currentSpace.type}
     </p>
-<button
+ <button
   onClick={() => setShowScanner(true)}
 >
   📷 Scan Card QR Code
@@ -3193,6 +3193,21 @@ function finishCard() {
     </button>
   </div>
 )}
+
+  </>
+) : (
+  <p>
+    🏨 This is a hotel space.
+  </p>
+)}
+
+<hr />
+          
+      </div>
+    </div>
+  )
+}
+ can you tell me delete only what part
 
 <hr />
           
