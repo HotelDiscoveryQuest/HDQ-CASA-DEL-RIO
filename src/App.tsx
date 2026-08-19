@@ -1580,146 +1580,6 @@ async function saveGameToSupabase(
   
     /*
     =========================================
-    RETURNING PLAYER
-    =========================================
-    */
-  
-    if (hasPlayedBefore === true) {
-      const savedGameIds: string[] = []
-  
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-  
-        if (
-          key &&
-          key.startsWith(
-            'hotelDiscoveryQuest_name_'
-          )
-        ) {
-          const savedName =
-            key.replace(
-              'hotelDiscoveryQuest_name_',
-              ''
-            )
-  
-          if (cleanNames.includes(savedName)) {
-            const savedGameId =
-              localStorage.getItem(key)
-  
-            if (savedGameId) {
-              savedGameIds.push(savedGameId)
-            }
-          }
-        }
-      }
-  
-      if (savedGameIds.length === 0) {
-        alert(
-          '❌ We could not find your previous game.\n\n' +
-          'Please check that you entered the same player name.'
-        )
-        return
-      }
-  
-      const existingGameId =
-        savedGameIds[0]
-  
-      const saved =
-        localStorage.getItem(
-          `hotelDiscoveryQuest_${existingGameId}`
-        )
-  
-      if (!saved) {
-        alert(
-          '❌ Your previous game could not be loaded.'
-        )
-        return
-      }
-  
-      try {
-        const data = JSON.parse(saved)
-  
-        setGameId(data.gameId)
-        setPlayers(data.players || 1)
-        setPlayerNames(
-          data.playerNames || cleanNames
-        )
-        setCurrentPlayer(
-          data.currentPlayer || 0
-        )
-        setPlayerData(
-          data.playerData || []
-        )
-        setRound(data.round || 1)
-        setPointMode(
-          data.pointMode || 'solo'
-        )
-        setRewardClaimCode(
-          data.rewardClaimCode || ''
-        )
-        setRewardClaimed(
-          data.rewardClaimed || false
-        )
-  
-        const playerIndex =
-          data.playerData.findIndex(
-            (player: PlayerData) =>
-              cleanNames.includes(
-                player.name.toLowerCase()
-              )
-          )
-  
-        if (playerIndex === -1) {
-          alert(
-            '❌ Your player name could not be found in the saved game.'
-          )
-          return
-        }
-  
-        setCurrentPlayer(playerIndex)
-        setScreen('board')
-  
-        alert(
-          `✅ Welcome back!\n\n` +
-          `👤 ${data.playerData[playerIndex].name}\n` +
-          `🆔 ${data.playerData[playerIndex].playerId}\n\n` +
-          `🎮 Game ID: ${data.gameId}`
-        )
-  
-        return
-  
-      } catch {
-        alert(
-          '❌ The previous game could not be loaded.'
-        )
-        return
-      }
-    }
-  
-    /*
-    =========================================
-    NEW PLAYER
-    =========================================
-    */
-  
-    for (const name of cleanNames) {
-      const savedGame =
-        localStorage.getItem(
-          `hotelDiscoveryQuest_name_${name}`
-        )
-  
-      if (savedGame) {
-        alert(
-          `⚠️ The name "${name}" has already been used.\n\n` +
-          `Please choose a different name or select "Yes, I played before".`
-        )
-  
-        return
-      }
-    }
-  
-    /*
-    =========================================
     CREATE NEW GAME
     =========================================
     */
@@ -1809,15 +1669,40 @@ cleanNames.forEach(name => {
     )
   }
 
+/*
+=========================================
+CONTINUE GAME
+=========================================
+*/
+
+async function continueGame() {
+
   /*
   =========================================
-  CONTINUE GAME
+  ASK FOR GAME ID
   =========================================
   */
 
-function continueGame() {
+  const enteredGameId = prompt(
+    '🎮 Enter your Game ID\n\n' +
+    'Example: HQ-4821'
+  )
+
+  if (!enteredGameId) return
+
+  const cleanGameId =
+    enteredGameId.trim().toUpperCase()
+
+
+  /*
+  =========================================
+  ASK FOR PLAYER NAME
+  =========================================
+  */
+
   const playerName = prompt(
-    '👤 Enter your player name'
+    '👤 Enter your player name\n\n' +
+    'Example: Zati'
   )
 
   if (!playerName) return
@@ -1825,139 +1710,128 @@ function continueGame() {
   const cleanName =
     playerName.trim().toLowerCase()
 
-  const savedGameIds: string[] = []
 
-  // Find games saved on this device
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
+  /*
+  =========================================
+  FIND GAME IN SUPABASE
+  =========================================
+  */
 
-    if (
-      key &&
-      key.startsWith(
-        'hotelDiscoveryQuest_name_'
-      )
-    ) {
-      const savedName =
-        key.replace(
-          'hotelDiscoveryQuest_name_',
-          ''
-        )
+  const { data: game, error } =
+    await supabase
+      .from('games')
+      .select('*')
+      .eq('game_id', cleanGameId)
+      .single()
 
-      if (savedName === cleanName) {
-        const savedGameId =
-          localStorage.getItem(key)
 
-        if (savedGameId) {
-          savedGameIds.push(savedGameId)
-        }
-      }
-    }
-  }
+  if (error || !game) {
 
-  if (savedGameIds.length === 0) {
-    alert(
-      `❌ No saved game found for "${playerName}".\n\n` +
-      `Make sure you use the same player name on the same device.`
-    )
-    return
-  }
-
-  const existingGameId =
-    savedGameIds[0]
-
-  const saved =
-    localStorage.getItem(
-      `hotelDiscoveryQuest_${existingGameId}`
-    )
-
-  if (!saved) {
-    alert(
-      '❌ Your saved game could not be loaded.'
-    )
-    return
-  }
-
-  try {
-    const data = JSON.parse(saved)
-
-    const loadedPlayers =
-      data.playerData || []
-
-    const foundPlayerIndex =
-      loadedPlayers.findIndex(
-        (player: PlayerData) =>
-          player.name
-            .trim()
-            .toLowerCase() ===
-          cleanName
-      )
-
-    if (foundPlayerIndex === -1) {
-      alert(
-        '❌ Your player could not be found in the saved game.'
-      )
-      return
-    }
-
-    setGameId(
-      data.gameId
-    )
-
-    setPlayers(
-      loadedPlayers.length || 1
-    )
-
-    setPlayerNames(
-      data.playerNames || []
-    )
-
-    setPlayerData(
-      loadedPlayers
-    )
-
-    setCurrentPlayer(
-      foundPlayerIndex
-    )
-
-    setRound(
-      data.round || 1
-    )
-
-    setPointMode(
-      data.pointMode || 'solo'
-    )
-
-    setRewardClaimCode(
-      data.rewardClaimCode || ''
-    )
-
-    setRewardClaimed(
-      data.rewardClaimed || false
-    )
-
-    setScreen('board')
-
-    alert(
-      `✅ Welcome back!\n\n` +
-      `👤 ${loadedPlayers[foundPlayerIndex].name}\n` +
-      `🆔 ${loadedPlayers[foundPlayerIndex].playerId}\n\n` +
-      `🎮 Game ID: ${data.gameId}\n` +
-      `🔄 Round: ${data.round || 1}\n\n` +
-      `Your saved game has been loaded.`
-    )
-
-  } catch (error) {
     console.error(
-      'Could not load saved game:',
+      'Could not find game:',
       error
     )
 
     alert(
-      '❌ The saved game could not be loaded.'
+      '❌ Game not found.\n\n' +
+      'Please check your Game ID.'
     )
-  }
-}
 
+    return
+  }
+
+
+  /*
+  =========================================
+  LOAD PLAYERS
+  =========================================
+  */
+
+  const loadedPlayers =
+    game.players || []
+
+
+  /*
+  =========================================
+  FIND THIS PLAYER
+  =========================================
+  */
+
+  const foundPlayerIndex =
+    loadedPlayers.findIndex(
+      (player: PlayerData) =>
+        player.name
+          .trim()
+          .toLowerCase() ===
+        cleanName
+    )
+
+
+  if (foundPlayerIndex === -1) {
+
+    alert(
+      `❌ Player "${playerName}" was not found in this game.\n\n` +
+      `Make sure you enter the same name that was registered when the game was created.`
+    )
+
+    return
+  }
+
+
+  /*
+  =========================================
+  LOAD GAME
+  =========================================
+  */
+
+  setGameId(
+    game.game_id
+  )
+
+  setPlayers(
+    loadedPlayers.length || 1
+  )
+
+  setPlayerNames(
+    loadedPlayers.map(
+      (player: PlayerData) =>
+        player.name
+    )
+  )
+
+  setPlayerData(
+    loadedPlayers
+  )
+
+  setCurrentPlayer(
+    foundPlayerIndex
+  )
+
+  setRound(
+    game.round || 1
+  )
+
+  setPointMode(
+    game.mode || 'solo'
+  )
+
+  setScreen('board')
+
+
+  /*
+  =========================================
+  SUCCESS
+  =========================================
+  */
+
+  alert(
+    `✅ Welcome to the game!\n\n` +
+    `👤 Player: ${loadedPlayers[foundPlayerIndex].name}\n` +
+    `🆔 Player ID: ${loadedPlayers[foundPlayerIndex].playerId}\n\n` +
+    `🎮 Game ID: ${game.game_id}\n` +
+    `🔄 Round: ${game.round || 1}`
+  )
+}
   /*
   =========================================
   FIND CARD NUMBER
