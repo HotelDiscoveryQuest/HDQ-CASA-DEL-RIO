@@ -85,6 +85,7 @@ type BoardSpace = {
 type Question = {
   id: number
   level: number
+  difficulty: Difficulty
   question: string
   answers: string[]
   points: number
@@ -149,12 +150,9 @@ function App() {
 
 const [screen, setScreen] =
   useState<Screen>('home')
-  const [cardToScan, setCardToScan] =
-  useState<string | null>(null)
 
   const [gameId, setGameId] = useState('')
-  const [continueId, setContinueId] = useState('')
-
+  
   // QR card detected from physical card
   const [qrCardType, setQrCardType] =
   useState<CardType | 'START' | null>(null)
@@ -199,9 +197,6 @@ const [rewardClaimed, setRewardClaimed] =
 
   const [round, setRound] = useState(1)
 
-  const [selectedCard, setSelectedCard] =
-    useState<CardType | null>(null)
-
   const [currentQuestion, setCurrentQuestion] =
     useState<Question | null>(null)
 
@@ -210,13 +205,8 @@ const [rewardClaimed, setRewardClaimed] =
   const [timeLeft, setTimeLeft] = useState(30)
 
   const [cardNumber, setCardNumber] = useState(0)
-
-  const [showMoveBox, setShowMoveBox] =
-    useState(false)
     const [showContinueChoice, setShowContinueChoice] =
   useState(false)
-    const [diceNumber, setDiceNumber] =
-  useState('')
 
   /*
   =========================================
@@ -1166,28 +1156,43 @@ P1
 =========================================
 */
 
-const match =
-  cardId.match(
-    /^(A|G|D|C|P)(\d+)$/
-  )
+/*
+=========================================
+CHECK PHYSICAL CARD
+=========================================
+*/
 
-if (!match) {
+const physicalCard = physicalCards.find(
+  card => card.id === cardId
+)
+
+if (!physicalCard) {
   alert(
-    `❌ Invalid card number.\n\n` +
+    `❌ Invalid card.\n\n` +
     `Scanned card: ${cardId}\n\n` +
-    `Example valid cards:\n` +
-    `A1, A2, G1, D1, C1, P1`
+    `This card is not registered in Hotel Discovery Quest.`
   )
 
   return
 }
 
-const cardType =
-  match[1] as CardType
+const cardType = physicalCard.type
+const cardNumber = physicalCard.number
 
-const cardNumber =
-  Number(match[2])
+console.log(
+  'PHYSICAL CARD:',
+  physicalCard
+)
 
+console.log(
+  'CARD TYPE:',
+  cardType
+)
+
+console.log(
+  'CARD NUMBER:',
+  cardNumber
+)
 console.log(
   'CARD TYPE:',
   cardType
@@ -1205,7 +1210,6 @@ CARD SCANNED SUCCESSFULLY
 */
 
 setCardNumber(cardNumber)
-setSelectedCard(cardType)
 setAnswer('')
 
 
@@ -1263,15 +1267,15 @@ if (
   =========================================
   */
 
-  if (cardType === 'A') {
+  if (qrCardType === 'A') {
     setScreen('question')
   }
 
-  if (cardType === 'G') {
+  if (qrCardType === 'G') {
     setScreen('challenge')
   }
 
-  if (cardType === 'D') {
+  if (qrCardType === 'D') {
     setScreen('discovery')
   }
 
@@ -1284,7 +1288,7 @@ CHANCE CARD
 =========================================
 */
 
-if (cardType === 'C') {
+if (qrCardType === 'C') {
   showChanceCard()
   return
 }
@@ -1295,7 +1299,7 @@ PENALTY CARD
 =========================================
 */
 
-if (cardType === 'P') {
+if (qrCardType === 'P') {
   showPenaltyCard()
   return
 }
@@ -1649,6 +1653,15 @@ async function saveGameToSupabase(
   )
 
   return true
+}
+ function generateRewardCode() {
+  return (
+    'HDQ-' +
+    Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase()
+  )
 }
 
   /*
@@ -2175,21 +2188,25 @@ function getQuestionForCard(
     return null
   }
 
-  // Try to get the exact question number
-  const exact = questions.find(
-    question => question.id === number
+  // Get the difficulty based on the current game level
+
+  // Find questions for this difficulty
+  const levelQuestions = questions.filter(
+    question => question.level === level
   )
 
-  if (exact) {
-    return exact
-  }
+  // If there are no questions for this level,
+  // use all questions as a fallback
+  const availableQuestions =
+    levelQuestions.length > 0
+      ? levelQuestions
+      : questions
 
-  // If card number is outside the question list,
-  // cycle back through the questions
+  // Use the physical card number to select a question
   const index =
-    Math.abs(number - 1) % questions.length
+    Math.abs(number - 1) % availableQuestions.length
 
-  return questions[index]
+  return availableQuestions[index]
 }
 
 
@@ -2254,11 +2271,11 @@ function getRandomQuestionForCard(
   =========================================
   */
 
-  const levelQuestions =
-    questions.filter(
-      question =>
-        question.difficulty === difficulty
-    )
+ const levelQuestions =
+  questions.filter(
+    question =>
+      getDifficulty(question.level) === difficulty
+  )
 
   /*
   =========================================
