@@ -2921,58 +2921,49 @@ function finishCard() {
   {currentSpace.name}
 </h2>
 
-{currentSpace.type ? (
-  <>
-    <p>
-      🎴 Card Type: {currentSpace.type}
-    </p>
+<div
+  style={{
+    marginTop: '20px',
+    padding: '20px',
+    backgroundColor: '#ffffff',
+    color: '#000000',
+    borderRadius: '15px',
+    border: '3px solid #000000'
+  }}
+>
+  <h2>📷 QR SCANNER TEST</h2>
 
-    <button
-      onClick={() => setShowScanner(true)}
+  <button
+    onClick={() => setShowScanner(true)}
+  >
+    📷 Scan Card QR Code
+  </button>
+
+  {showScanner && (
+    <div
+      style={{
+        marginTop: '20px'
+      }}
     >
-      📷 Scan Card QR Code
-    </button>
+      <h3>📷 Camera Scanner</h3>
 
-    {showScanner && (
       <div
+        id="qr-reader"
         style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          color: 'black',
-          borderRadius: '15px',
-          border: '3px solid black'
+          width: '100%',
+          maxWidth: '500px',
+          margin: 'auto'
         }}
+      ></div>
+
+      <button
+        onClick={() => setShowScanner(false)}
       >
-        <h2>📷 Scan Physical Card</h2>
-
-        <p>
-          Point your camera at the QR code
-          on the physical card.
-        </p>
-
-        <div
-          id="qr-reader"
-          style={{
-            width: '100%',
-            maxWidth: '500px',
-            margin: 'auto'
-          }}
-        ></div>
-
-        <button
-          onClick={() => setShowScanner(false)}
-        >
-          ❌ Close Scanner
-        </button>
-      </div>
-    )}
-  </>
-) : (
-  <p>
-    🏨 This is a hotel space.
-  </p>
-)}
+        ❌ Close Scanner
+      </button>
+    </div>
+  )}
+</div>
 
 <hr />
           
