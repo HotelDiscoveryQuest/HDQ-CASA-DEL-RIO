@@ -1308,9 +1308,10 @@ OPEN QUESTION IMMEDIATELY
 =========================================
 */
 
-if (cardType === 'A') {
+if (type === 'A') {
 
-  const question = getRandomQuestionForCard('A')
+  const question =
+    getRandomQuestionForCard('A')
 
   if (!question) {
     alert('⚠️ No Attraction question found.')
@@ -1324,9 +1325,10 @@ if (cardType === 'A') {
   return
 }
 
-if (cardType === 'G') {
+if (type === 'G') {
 
-  const question = getRandomQuestionForCard('G')
+  const question =
+    getRandomQuestionForCard('G')
 
   if (!question) {
     alert('⚠️ No Challenge question found.')
@@ -1340,9 +1342,11 @@ if (cardType === 'G') {
   return
 }
 
-if (cardType === 'D') {
+if (type === 'D') {
 
-  const question = getRandomQuestionForCard('D')
+  const question =
+    getRandomQuestionForCard('D')
+
   if (!question) {
     alert('⚠️ No Discovery question found.')
     return
@@ -1355,16 +1359,15 @@ if (cardType === 'D') {
   return
 }
 
-if (cardType === 'C') {
+if (type === 'C') {
   showChanceCard()
   return
 }
 
-if (cardType === 'P') {
+if (type === 'P') {
   showPenaltyCard()
   return
 }
-
       /*
       =========================================
       NEXT STEP
