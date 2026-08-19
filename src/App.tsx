@@ -19,58 +19,6 @@ type CardId = {
   name: string
 }
 
-const physicalCards: CardId[] = [
-  // =========================
-  // CHANCE
-  // =========================
-  { id: 'C1', type: 'C', number: 1, name: 'Chance' },
-  { id: 'C2', type: 'C', number: 2, name: 'Chance' },
-  { id: 'C3', type: 'C', number: 3, name: 'Chance' },
-  { id: 'C4', type: 'C', number: 4, name: 'Chance' },
-  { id: 'C5', type: 'C', number: 5, name: 'Chance' },
-  { id: 'C6', type: 'C', number: 6, name: 'Chance' },
-
-  // =========================
-  // DISCOVERY
-  // =========================
-  { id: 'D1', type: 'D', number: 1, name: 'Discovery' },
-  { id: 'D2', type: 'D', number: 2, name: 'Discovery' },
-  { id: 'D3', type: 'D', number: 3, name: 'Discovery' },
-  { id: 'D4', type: 'D', number: 4, name: 'Discovery' },
-  { id: 'D5', type: 'D', number: 5, name: 'Discovery' },
-  { id: 'D6', type: 'D', number: 6, name: 'Discovery' },
-
-  // =========================
-  // CHALLENGE
-  // =========================
-  { id: 'G1', type: 'G', number: 1, name: 'Challenge' },
-  { id: 'G2', type: 'G', number: 2, name: 'Challenge' },
-  { id: 'G3', type: 'G', number: 3, name: 'Challenge' },
-  { id: 'G4', type: 'G', number: 4, name: 'Challenge' },
-  { id: 'G5', type: 'G', number: 5, name: 'Challenge' },
-
-  // =========================
-  // ATTRACTION
-  // =========================
-  { id: 'A1', type: 'A', number: 1, name: 'Attraction' },
-  { id: 'A2', type: 'A', number: 2, name: 'Attraction' },
-  { id: 'A3', type: 'A', number: 3, name: 'Attraction' },
-  { id: 'A4', type: 'A', number: 4, name: 'Attraction' },
-  { id: 'A5', type: 'A', number: 5, name: 'Attraction' },
-  { id: 'A6', type: 'A', number: 6, name: 'Attraction' },
-  { id: 'A7', type: 'A', number: 7, name: 'Attraction' },
-
-  // =========================
-  // PENALTY
-  // =========================
-  { id: 'P1', type: 'P', number: 1, name: 'Penalty' },
-  { id: 'P2', type: 'P', number: 2, name: 'Penalty' },
-  { id: 'P3', type: 'P', number: 3, name: 'Penalty' },
-  { id: 'P4', type: 'P', number: 4, name: 'Penalty' },
-  { id: 'P5', type: 'P', number: 5, name: 'Penalty' },
-  { id: 'P6', type: 'P', number: 6, name: 'Penalty' }
-]
-
 type BoardSpace = {
   position: number
   name: string
@@ -1241,7 +1189,7 @@ if (
   cardType === 'D'
 ) {
   const question =
-    getRandomQuestionForCard(cardType)
+    getRandomQuestionForCard(type)
 
   if (!question) {
     alert(
