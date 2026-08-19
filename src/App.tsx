@@ -998,32 +998,6 @@ CAMERA QR SCANNER
 =========================================
 */
 useEffect(() => {
-  const url = new URL(window.location.href)
-  const card = url.searchParams.get('card')
-
-  if (!card) return
-
-  const cardId = card.toUpperCase()
-
-  if (!/^(A|G|D|C|P)\d+$/.test(cardId)) {
-    return
-  }
-
-  const cardType =
-    cardId.charAt(0) as CardType
-
-  const cardNumber =
-    Number(cardId.substring(1))
-
-  setQrCardType(cardType)
-  setCardNumber(cardNumber)
-
-  chooseLandedCard(
-    cardType,
-    cardNumber
-  )
-}, [])
-useEffect(() => {
   if (!showScanner) return
 
   const scanner = new Html5Qrcode('qr-reader')
@@ -1092,7 +1066,7 @@ useEffect(() => {
           // Not a URL
         }
       }
-
+      
       /*
 =========================================
 CHECK CARD ID
@@ -1285,129 +1259,107 @@ if (cardType === 'P') {
       .catch(() => {})
   }
 }, [showScanner])
-  /*
-  =========================================
-  QR READER
-  =========================================
 
-  IMPORTANT:
-  The QR is printed on the physical card.
+/*
+=========================================
+QR URL → QUESTION
+=========================================
+*/
 
-  Example:
+useEffect(() => {
+  const params = new URLSearchParams(
+    window.location.search
+  )
 
-  Chance QR:
-  ?card=C
+  const card =
+    params.get('card')?.toUpperCase()
 
-  Discovery QR:
-  ?card=D
+  if (!card) return
 
-  Challenge QR:
-  ?card=G
+  const match =
+    card.match(/^(A|G|D|C|P)(\d+)$/)
 
-  Attraction QR:
-  ?card=A
+  if (!match) return
 
-  Penalty QR:
-  ?card=P
-  =========================================
-  */
+  const cardType =
+    match[1] as CardType
 
-  useEffect(() => {
-    const params = new URLSearchParams(
-      window.location.search
-    )
-  
-    const card = params.get('card')
-  
-    if (
-      card !== 'START' &&
-      card !== 'C' &&
-      card !== 'D' &&
-      card !== 'G' &&
-      card !== 'A' &&
-      card !== 'P'
-    ) {
-      return
-    }
-  
-    // START QR
-    if (card === 'START') {
-      setQrCardType('START')
-  
-      window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname
+  const cardNumber =
+    Number(match[2])
+
+  console.log(
+    'QR CARD:',
+    cardType,
+    cardNumber
+  )
+
+  setQrCardType(cardType)
+  setCardNumber(cardNumber)
+  setSelectedCard(cardType)
+  setAnswer('')
+
+  if (cardType === 'A') {
+    const question =
+      getRandomQuestionForCard('A')
+
+    if (!question) {
+      alert(
+        '⚠️ No Attraction question found.'
       )
-  
       return
     }
-  
-    // Try to find the most recently saved game
-    let latestGameId: string | null = null
-  
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-  
-      if (
-        key &&
-        key.startsWith('hotelDiscoveryQuest_HQ-')
-      ) {
-        latestGameId = key.replace(
-          'hotelDiscoveryQuest_',
-          ''
-        )
-      }
-    }
-  
-    if (latestGameId) {
-      const saved =
-        localStorage.getItem(
-          `hotelDiscoveryQuest_${latestGameId}`
-        )
-  
-      if (saved) {
-        try {
-          const data = JSON.parse(saved)
-  
-          setGameId(data.gameId)
-setPlayers(data.players || 1)
-setPlayerNames(data.playerNames || [''])
-setCurrentPlayer(data.currentPlayer || 0)
-setPlayerData(data.playerData || [])
-setRound(data.round || 1)
-setPointMode(data.pointMode || 'solo')
-setRewardClaimCode(data.rewardClaimCode || '')
-setRewardClaimed(data.rewardClaimed || false)
-  
-          setQrCardType(
-            card as CardType
-          )
-  
-          setScreen('board')
-  
-          window.history.replaceState(
-            {},
-            document.title,
-            window.location.pathname
-          )
-  
-          return
-        } catch {
-          console.log(
-            'Could not load saved game'
-          )
-        }
-      }
-    }
-  
-    alert(
-      '⚠️ Please start the game first by scanning the START QR.'
-    )
-  
-  }, [])
 
+    setCurrentQuestion(question)
+    setTimeLeft(question.time)
+    setScreen('question')
+    return
+  }
 
+  if (cardType === 'G') {
+    const question =
+      getRandomQuestionForCard('G')
+
+    if (!question) {
+      alert(
+        '⚠️ No Challenge question found.'
+      )
+      return
+    }
+
+    setCurrentQuestion(question)
+    setTimeLeft(question.time)
+    setScreen('challenge')
+    return
+  }
+
+  if (cardType === 'D') {
+    const question =
+      getRandomQuestionForCard('D')
+
+    if (!question) {
+      alert(
+        '⚠️ No Discovery question found.'
+      )
+      return
+    }
+
+    setCurrentQuestion(question)
+    setTimeLeft(question.time)
+    setScreen('discovery')
+    return
+  }
+
+  if (cardType === 'C') {
+    showChanceCard()
+    return
+  }
+
+  if (cardType === 'P') {
+    showPenaltyCard()
+    return
+  }
+}, [])
+  
   /*
 =========================================
 TIMER
