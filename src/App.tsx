@@ -106,7 +106,15 @@ type PlayerData = {
     D: number[]
   }
 }
-
+function generateRewardCode() {
+  return (
+    'HDQ-' +
+    Math.random()
+      .toString(36)
+      .substring(2, 8)
+      .toUpperCase()
+  )
+}
 const REWARDS = [
   {
     id: 'stay',
