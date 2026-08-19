@@ -1815,139 +1815,74 @@ cleanNames.forEach(name => {
   =========================================
   */
 
-  async function continueGame() {
-    const playerName = prompt(
-      '👤 Enter your player name'
-    )
-  
-    if (!playerName) return
-  
-    const cleanName =
-      playerName.trim().toLowerCase()
-  
-    // Find saved games of the selected type
-    const { data: games, error } = await supabase
-      .from('games')
-      .select('*')
-      .eq('mode', pointMode)
-  
-    if (error) {
-      console.error(
-        'Could not find game:',
-        error
-      )
-  
-      alert(
-        '❌ Could not connect to the game server.\n\n' +
-        'Please check your internet connection.'
-      )
-  
-      return
-    }
-  
-    // Find all games containing this player
-    const matchingGames =
-      (games || []).filter(
-        game => {
-          const players =
-            game.players || []
-  
-          return players.some(
-            (player: PlayerData) =>
-              player.name
-                .trim()
-                .toLowerCase() ===
-              cleanName
-          )
-        }
-      )
-  
+function continueGame() {
+  const playerName = prompt(
+    '👤 Enter your player name'
+  )
+
+  if (!playerName) return
+
+  const cleanName =
+    playerName.trim().toLowerCase()
+
+  const savedGameIds: string[] = []
+
+  // Find games saved on this device
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+
     if (
-      matchingGames.length === 0
-    ) {
-      alert(
-        `❌ No saved game found for "${playerName}".\n\n` +
-        `Make sure you selected the correct game type:\n` +
-        `${pointMode === 'group'
-          ? '👥 Group Game'
-          : '👤 Solo Game'}`
+      key &&
+      key.startsWith(
+        'hotelDiscoveryQuest_name_'
       )
-  
-      return
-    }
-  
-    let selectedGame: any = null
-  
-    // Only one game found
-    if (
-      matchingGames.length === 1
     ) {
-      selectedGame =
-        matchingGames[0]
-    }
-  
-    // Multiple games found
-    else {
-      const gameList =
-        matchingGames
-          .map(
-            (game, index) => {
-              const players =
-                game.players || []
-  
-              const player =
-                players.find(
-                  (p: PlayerData) =>
-                    p.name
-                      .trim()
-                      .toLowerCase() ===
-                    cleanName
-                )
-  
-              return (
-                `${index + 1}. 🎮 ${game.game_id}\n` +
-                `   👤 ${player?.name || playerName}\n` +
-                `   🔄 Round ${game.round || 1}`
-              )
-            }
-          )
-          .join('\n\n')
-  
-      const choice = prompt(
-        `🔎 Multiple saved games found!\n\n` +
-        `${gameList}\n\n` +
-        `Enter the number of the game you want to continue:`
-      )
-  
-      if (!choice) return
-  
-      const selectedIndex =
-        Number(choice) - 1
-  
-      if (
-        !Number.isInteger(
-          selectedIndex
-        ) ||
-        selectedIndex < 0 ||
-        selectedIndex >=
-          matchingGames.length
-      ) {
-        alert(
-          '⚠️ Invalid game selection.'
+      const savedName =
+        key.replace(
+          'hotelDiscoveryQuest_name_',
+          ''
         )
-  
-        return
+
+      if (savedName === cleanName) {
+        const savedGameId =
+          localStorage.getItem(key)
+
+        if (savedGameId) {
+          savedGameIds.push(savedGameId)
+        }
       }
-  
-      selectedGame =
-        matchingGames[
-          selectedIndex
-        ]
     }
-  
+  }
+
+  if (savedGameIds.length === 0) {
+    alert(
+      `❌ No saved game found for "${playerName}".\n\n` +
+      `Make sure you use the same player name on the same device.`
+    )
+    return
+  }
+
+  const existingGameId =
+    savedGameIds[0]
+
+  const saved =
+    localStorage.getItem(
+      `hotelDiscoveryQuest_${existingGameId}`
+    )
+
+  if (!saved) {
+    alert(
+      '❌ Your saved game could not be loaded.'
+    )
+    return
+  }
+
+  try {
+    const data = JSON.parse(saved)
+
     const loadedPlayers =
-      selectedGame.players || []
-  
+      data.playerData || []
+
     const foundPlayerIndex =
       loadedPlayers.findIndex(
         (player: PlayerData) =>
@@ -1956,69 +1891,72 @@ cleanNames.forEach(name => {
             .toLowerCase() ===
           cleanName
       )
-  
-    if (
-      foundPlayerIndex === -1
-    ) {
+
+    if (foundPlayerIndex === -1) {
       alert(
-        '❌ Player could not be found in this game.'
+        '❌ Your player could not be found in the saved game.'
       )
-  
       return
     }
-  
-    const loadedPlayerNames =
-      loadedPlayers.map(
-        (player: PlayerData) =>
-          player.name
-      )
-  
+
     setGameId(
-      selectedGame.game_id
+      data.gameId
     )
-  
+
     setPlayers(
       loadedPlayers.length || 1
     )
-  
+
     setPlayerNames(
-      loadedPlayerNames
+      data.playerNames || []
     )
-  
+
     setPlayerData(
       loadedPlayers
     )
-  
+
     setCurrentPlayer(
       foundPlayerIndex
     )
-  
+
     setRound(
-      selectedGame.round || 1
+      data.round || 1
     )
-  
+
     setPointMode(
-      selectedGame.mode || 'solo'
+      data.pointMode || 'solo'
     )
-  
+
     setRewardClaimCode(
-      selectedGame.reward_claim_code || ''
+      data.rewardClaimCode || ''
     )
-  
+
     setRewardClaimed(
-      selectedGame.reward_claimed || false
+      data.rewardClaimed || false
     )
-  
+
     setScreen('board')
-  
+
     alert(
       `✅ Welcome back!\n\n` +
       `👤 ${loadedPlayers[foundPlayerIndex].name}\n` +
-      `🎮 Game: ${selectedGame.game_id}\n` +
-      `🔄 Round: ${selectedGame.round || 1}\n\n` +
+      `🆔 ${loadedPlayers[foundPlayerIndex].playerId}\n\n` +
+      `🎮 Game ID: ${data.gameId}\n` +
+      `🔄 Round: ${data.round || 1}\n\n` +
       `Your saved game has been loaded.`
     )
+
+  } catch (error) {
+    console.error(
+      'Could not load saved game:',
+      error
+    )
+
+    alert(
+      '❌ The saved game could not be loaded.'
+    )
   }
+}
 
   /*
   =========================================
