@@ -158,6 +158,8 @@ function App() {
 
 const [screen, setScreen] =
   useState<Screen>('home')
+  const [showContinueChoice, setShowContinueChoice] =
+  useState(false)
 
   const [gameId, setGameId] = useState('')
   
