@@ -2944,15 +2944,21 @@ function finishCard() {
           border: '3px solid black'
         }}
       >
-        <h2>
-          📷 Scan Physical Card
-        </h2>
+        <h2>📷 Scan Physical Card</h2>
 
         <p>
-          Point your camera at the QR code on the card.
+          Point your camera at the QR code
+          on the physical card.
         </p>
 
-        <div id="qr-reader"></div>
+        <div
+          id="qr-reader"
+          style={{
+            width: '100%',
+            maxWidth: '500px',
+            margin: 'auto'
+          }}
+        ></div>
 
         <button
           onClick={() => setShowScanner(false)}
