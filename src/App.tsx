@@ -207,7 +207,7 @@ const [rewardClaimed, setRewardClaimed] =
 
   const [round, setRound] = useState(1)
 
-  const [selectedCard, setSelectedCard] =
+  const [, setSelectedCard] =
     useState<CardType | null>(null)
 
   const [currentQuestion, setCurrentQuestion] =
