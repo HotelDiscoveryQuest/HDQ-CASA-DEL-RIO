@@ -2276,14 +2276,14 @@ function chooseLandedCard(
   */
 
   const number =
-    scannedNumber ??
-    getCardNumber(
-      player.position,
-      type
-    )
+  scannedNumber ??
+  getCardNumber(
+    player.position,
+    cardType
+  )
 
-  setCardNumber(number)
-  setSelectedCard(type)
+setCardNumber(number)
+setSelectedCard(cardType)
   setAnswer('')
   /*
   =========================================
@@ -2291,7 +2291,7 @@ function chooseLandedCard(
   =========================================
   */
 
-  if (cardType === 'A') {
+  if (qrCardType === 'A') { 
 
     const question =
       getRandomQuestionForCard('A')
@@ -2316,8 +2316,7 @@ function chooseLandedCard(
   =========================================
   */
 
-  if (cardType === 'G') {
-
+  if (qrCardType === 'G') {
     const question =
       getRandomQuestionForCard('G')
   
@@ -2341,7 +2340,7 @@ function chooseLandedCard(
   =========================================
   */
 
-  if (cardType === 'D') {
+  if (qrCardType === 'D') {
 
     const question =
       getRandomQuestionForCard('D')
@@ -2366,7 +2365,7 @@ function chooseLandedCard(
   =========================================
   */
 
-  if (cardType === 'C') {
+  if (qrCardType === 'C') {
     showChanceCard()
     return
   }
@@ -2377,7 +2376,7 @@ function chooseLandedCard(
   =========================================
   */
 
-  if (cardType === 'P') {
+  if (qrCardType === 'P') {
     showPenaltyCard()
     return
   }
