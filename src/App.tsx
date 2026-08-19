@@ -997,7 +997,32 @@ useEffect(() => {
 CAMERA QR SCANNER
 =========================================
 */
+useEffect(() => {
+  const url = new URL(window.location.href)
+  const card = url.searchParams.get('card')
 
+  if (!card) return
+
+  const cardId = card.toUpperCase()
+
+  if (!/^(A|G|D|C|P)\d+$/.test(cardId)) {
+    return
+  }
+
+  const cardType =
+    cardId.charAt(0) as CardType
+
+  const cardNumber =
+    Number(cardId.substring(1))
+
+  setQrCardType(cardType)
+  setCardNumber(cardNumber)
+
+  chooseLandedCard(
+    cardType,
+    cardNumber
+  )
+}, [])
 useEffect(() => {
   if (!showScanner) return
 
