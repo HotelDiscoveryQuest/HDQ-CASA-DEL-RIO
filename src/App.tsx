@@ -151,7 +151,7 @@ const [rewardClaimed, setRewardClaimed] =
 
   const [answer, setAnswer] = useState('')
 
-  const [timeLeft, setTimeLeft] = useState(30)
+  const [timeLeft, setTimeLeft] = useState(60)
 
   const [cardNumber, setCardNumber] = useState(0)
 
