@@ -3186,27 +3186,12 @@ function finishCard() {
 
     <div id="qr-reader"></div>
 
-    <button
-      onClick={() => setShowScanner(false)}
-    >
-      ❌ Close Scanner
-    </button>
-  </div>
-)}
-
-  </>
+   </>
 ) : (
   <p>
     🏨 This is a hotel space.
   </p>
 )}
-
-<hr />
-          
-      </div>
-    </div>
-  )
-}
 
 <hr />
           
