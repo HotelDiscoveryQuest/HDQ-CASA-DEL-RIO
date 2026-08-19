@@ -2105,15 +2105,15 @@ function getRandomQuestionForCard(
 ) {
   let questions: Question[] = []
 
-  if (cardType === 'A') {
+  if (type === 'A') {
     questions = attractionQuestions
   }
 
-  if (cardType === 'G') {
+  if (type === 'G') {
     questions = challengeQuestions
   }
 
-  if (cardType === 'D') {
+  if (type === 'D') {
     questions = discoveryQuestions
   }
 
