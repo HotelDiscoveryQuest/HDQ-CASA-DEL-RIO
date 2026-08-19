@@ -1263,15 +1263,15 @@ if (
   =========================================
   */
 
-  if (type === 'A') {
+  if (qrCardType === 'A') {
     setScreen('question')
   }
 
-  if (type === 'G') {
+  if (qrCardType === 'G') {
     setScreen('challenge')
   }
 
-  if (type === 'D') {
+  if (qrCardType === 'D') {
     setScreen('discovery')
   }
 
@@ -1284,7 +1284,7 @@ CHANCE CARD
 =========================================
 */
 
-if (type === 'C') {
+if (qrCardType === 'C') {
   showChanceCard()
   return
 }
@@ -1295,7 +1295,7 @@ PENALTY CARD
 =========================================
 */
 
-if (type === 'P') {
+if (qrCardType === 'P') {
   showPenaltyCard()
   return
 }
