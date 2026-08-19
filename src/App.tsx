@@ -2244,6 +2244,7 @@ if (qrCardType === 'P') {
   showPenaltyCard()
   return
 }
+ }
   /*
   =========================================
   CHECK ANSWERS
