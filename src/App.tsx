@@ -157,12 +157,9 @@ function App() {
 
 const [screen, setScreen] =
   useState<Screen>('home')
-  const [cardToScan, setCardToScan] =
-  useState<string | null>(null)
 
   const [gameId, setGameId] = useState('')
-  const [continueId, setContinueId] = useState('')
-
+  
   // QR card detected from physical card
   const [qrCardType, setQrCardType] =
   useState<CardType | 'START' | null>(null)
@@ -1573,7 +1570,7 @@ useEffect(() => {
     setPlayerData(
       Array.from(
         { length: number },
-        (_, index) => ({
+        () => ({
           name: '',
           playerId: '',
           points: 0,
@@ -2160,47 +2157,6 @@ cleanNames.forEach(name => {
 GET QUESTION
 =========================================
 */
-
-function getQuestionForCard(
-  type: 'A' | 'G' | 'D',
-  number: number
-) {
-  let questions: Question[] = []
-
-  if (type === 'A') {
-    questions = attractionQuestions
-  }
-
-  if (type === 'G') {
-    questions = challengeQuestions
-  }
-
-  if (type === 'D') {
-    questions = discoveryQuestions
-  }
-
-  // Make sure questions exist
-  if (questions.length === 0) {
-    return null
-  }
-
-  // Try to get the exact question number
-  const exact = questions.find(
-    question => question.id === number
-  )
-
-  if (exact) {
-    return exact
-  }
-
-  // If card number is outside the question list,
-  // cycle back through the questions
-  const index =
-    Math.abs(number - 1) % questions.length
-
-  return questions[index]
-}
-
 
 /*
 =========================================
