@@ -2205,16 +2205,16 @@ function chooseLandedCard(
   =========================================
   */
 
-  const number =
+ const number =
   scannedNumber ??
   getCardNumber(
     player.position,
-    cardType
+    type
   )
 
 setCardNumber(number)
-setSelectedCard(cardType)
-  setAnswer('')
+setSelectedCard(type)
+setAnswer('')
   /*
   =========================================
   ATTRACTION
