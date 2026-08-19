@@ -3194,47 +3194,6 @@ function finishCard() {
   </div>
 )}
 
-    <button
-      onClick={() => setShowScanner(true)}
-    >
-      📷 Scan Card QR Code
-    </button>
-
-    {showScanner && (
-      <div
-        style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          color: 'black',
-          borderRadius: '15px',
-          border: '3px solid black'
-        }}
-      >
-        <h2>
-          📷 Scan Physical Card
-        </h2>
-
-        <p>
-          Point your camera at the QR code on the card.
-        </p>
-
-        <div id="qr-reader"></div>
-
-        <button
-          onClick={() => setShowScanner(false)}
-        >
-          ❌ Close Scanner
-        </button>
-      </div>
-    )}
-  </>
-) : (
-  <p>
-    🏨 This is a hotel space.
-  </p>
-)}
-
 <hr />
           
       </div>
