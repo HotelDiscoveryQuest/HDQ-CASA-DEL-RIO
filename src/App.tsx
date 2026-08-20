@@ -1069,30 +1069,58 @@ useEffect(() => {
       =========================================
       */
 
-      if (!cardId) {
+     if (!cardId) {
 
-        try {
+  try {
 
-          const url =
-            new URL(
-              decodedText.trim()
-            )
+    const url =
+      new URL(
+        decodedText.trim()
+      )
 
-          const value =
-            url.searchParams
-              .get('card')
-              ?.trim()
-              .toUpperCase()
+    const value =
+      url.searchParams
+        .get('card')
+        ?.trim()
+        .toUpperCase()
 
-          if (value) {
-            cardId = value
-          }
+    if (value) {
+      cardId = value
+    }
 
-        } catch {
-          // Not a URL
-        }
-      }
+  } catch {
+    // Not a URL
+  }
+}
 
+/*
+=========================================
+FORMAT 3
+RAW CARD ID
+
+Examples:
+A1
+A2
+G1
+D1
+C1
+P1
+=========================================
+*/
+
+if (!cardId) {
+
+  const rawCard =
+    decodedText
+      .trim()
+      .toUpperCase()
+
+  if (
+    /^(A|G|D|C|P)(\d+)$/.test(rawCard)
+  ) {
+    cardId = rawCard
+  }
+}
       /*
       =========================================
       CHECK CARD ID
