@@ -1043,6 +1043,13 @@ const scannedText =
   decodedText
     .trim()
     .toUpperCase()
+      
+      if (
+  scannedText ===
+  'HTTPS://Q.ME-QR.COM/Z4L5NUQJ'
+) {
+  cardId = 'A1'
+}
 
 console.log(
   'RAW QR CONTENT:',
