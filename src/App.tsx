@@ -2927,107 +2927,138 @@ return (
     </h2>
 
     {currentSpace.type ? (
+  <>
 
-      <>
+    <p>
+      🎴 Card Type: {currentSpace.type}
+    </p>
 
-        <p>
-          🎴 Card Type:{' '}
-          {currentSpace.type}
-        </p>
+    {/* =========================================
+        QR SCANNER
+        ========================================= */}
 
-        <div
-          style={{
-            marginTop: '20px',
-            padding: '20px',
-            backgroundColor: '#ffffff',
-            color: '#000000',
-            borderRadius: '15px',
-            border: '3px solid #000000'
-          }}
-        >
+    <div
+      style={{
+        marginTop: '20px',
+        padding: '20px',
+        backgroundColor: '#ffffff',
+        color: '#000000',
+        borderRadius: '15px',
+        border: '3px solid #000000'
+      }}
+    >
+      <h2>📷 Scan Physical Card</h2>
 
-          <h2>
-            📷 QR SCANNER
-          </h2>
+      {!showScanner && (
+        <>
+          <p>
+            Scan the QR code on the physical card
+            to continue.
+          </p>
 
-          {!showScanner && (
+          <button
+            onClick={() =>
+              setShowScanner(true)
+            }
+          >
+            📷 Scan Card QR Code
+          </button>
+        </>
+      )}
 
-            <button
-              onClick={() =>
-                setShowScanner(true)
-              }
-            >
-              📷 Scan Card QR Code
-            </button>
+      {showScanner && (
+        <>
+          <h3>
+            📷 Camera Scanner
+          </h3>
 
-          )}
+          <p>
+            Point your camera at the QR code
+            on the physical card.
+          </p>
 
-          {showScanner && (
+          <div
+            id="qr-reader"
+            style={{
+              width: '100%',
+              maxWidth: '500px',
+              margin: '20px auto',
+              padding: '10px',
+              backgroundColor: 'white',
+              color: 'black',
+              borderRadius: '15px',
+              border: '3px solid black'
+            }}
+          ></div>
 
-            <div
-              style={{
-                marginTop: '20px',
-                padding: '15px',
-                backgroundColor: 'white',
-                color: 'black',
-                borderRadius: '15px',
-                border: '3px solid black',
-                width: '100%',
-                maxWidth: '500px',
-                margin: '20px auto'
-              }}
-            >
+          <button
+            onClick={() =>
+              setShowScanner(false)
+            }
+          >
+            ❌ Close Scanner
+          </button>
+        </>
+      )}
+    </div>
 
-              <h2>
-                📷 Scan Physical Card
-              </h2>
+  </>
+) : (
+  <p>
+    🏨 This is a hotel space.
+  </p>
+)}
 
-              <p>
-                Point your camera at the QR
-                code on the physical card.
-              </p>
+<hr />
 
-              <div
-                id="qr-reader"
-                style={{
-                  width: '100%',
-                  maxWidth: '500px',
-                  margin: 'auto'
-                }}
-              ></div>
+<button
+  onClick={async () => {
 
-              <button
-                onClick={() =>
-                  setShowScanner(false)
-                }
-              >
-                ❌ Close Scanner
-              </button>
+    const confirmed =
+      window.confirm(
+        '💾 Save and Exit?\n\n' +
+        'Your current points and game progress will be saved.'
+      )
 
-            </div>
+    if (!confirmed) {
+      return
+    }
 
-          )}
+    if (gameId) {
 
-        </div>
+      const saved =
+        await saveGameToSupabase(
+          gameId,
+          pointMode,
+          playerData,
+          round
+        )
 
-      </>
+      if (!saved) {
 
-    ) : (
+        alert(
+          '❌ Could not save the game.'
+        )
 
-      <p>
-        🏨 This is a hotel space.
-      </p>
+        return
+      }
+    }
 
-    )}
+    alert(
+      '✅ Game saved successfully!'
+    )
 
-    <hr />
+    setScreen('home')
+  }}
+>
+  💾 Save & Exit
+</button>
 
-  </div>
+</div>
 
 </div>
 )
 }
-
 /*
  =========================================
  QUESTION SCREEN
