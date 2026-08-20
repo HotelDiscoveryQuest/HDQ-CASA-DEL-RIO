@@ -2040,7 +2040,7 @@ function chooseLandedCard(
   type: CardType,
   scannedNumber?: number
 ) {
-  const currentPlayerInfo == playerData[currentPlayer]
+   const player == playerData[currentPlayer]
 
   if (!player) {
     alert('⚠️ Player data could not be found.')
