@@ -1181,17 +1181,17 @@ useEffect(() => {
       =========================================
       */
 
-      const currentPlayerInfo =
-        playerData[currentPlayer]
+      const player =
+  playerData[currentPlayer]
 
-      if (!player) {
+if (!player) {
 
-        alert(
-          '❌ Player information could not be found.'
-        )
+  alert(
+    '❌ Player information could not be found.'
+  )
 
-        return
-      }
+  return
+}
 
       /*
       =========================================
