@@ -104,9 +104,6 @@ const [gameId, setGameId] = useState('')
 const [showScanner, setShowScanner] =
   useState(false)
 
-const [qrCardType, setQrCardType] =
-  useState<CardType | 'START' | null>(null)
-
 const [cardNumber, setCardNumber] =
   useState(0)
 
@@ -1225,7 +1222,6 @@ useEffect(() => {
 
       if (cardType === 'C') {
 
-        setQrCardType(cardType)
         setCardNumber(cardNumber)
         setSelectedCard(cardType)
 
@@ -1253,7 +1249,6 @@ useEffect(() => {
 
       if (cardType === 'P') {
 
-        setQrCardType(cardType)
         setCardNumber(cardNumber)
         setSelectedCard(cardType)
 
@@ -1360,8 +1355,6 @@ useEffect(() => {
       SAVE CARD INFORMATION
       =========================================
       */
-
-      setQrCardType(cardType)
 
       setCardNumber(cardNumber)
 
@@ -2069,7 +2062,6 @@ function chooseLandedCard(
 
   setCardNumber(number)
   setSelectedCard(type)
-  setQrCardType(type)
   setAnswer('')
 
   /*
@@ -2380,7 +2372,6 @@ function finishCard() {
   setAnswer('')
   setCurrentQuestion(null)
   setSelectedCard(null)
-  setQrCardType(null)
   setTimeLeft(0)
 
   /*
