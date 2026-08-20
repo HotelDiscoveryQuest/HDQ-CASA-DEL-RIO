@@ -1971,12 +1971,25 @@ number++
 return number
 }
 
-/*
-=========================================
-GET QUESTION
-=========================================
-*/
+function getPositionFromCard(
+  type: CardType,
+  cardNumber: number
+) {
+  let count = 0
 
+  for (let i = 0; i < board.length; i++) {
+    if (board[i].type === type) {
+      count++
+
+      if (count === cardNumber) {
+        return i
+      }
+    }
+  }
+
+  return -1
+}
+  
 /*
 =========================================
 RANDOM QUESTION BY ROUND
@@ -2079,18 +2092,33 @@ function chooseLandedCard(
     return
   }
 
-  /*
-  =========================================
-  CARD NUMBER
-  =========================================
-  */
-
   const number =
     scannedNumber ??
     getCardNumber(
       player.position,
       type
     )
+
+  if (scannedNumber !== undefined) {
+    const cardPosition =
+      getPositionFromCard(
+        type,
+        scannedNumber
+      )
+
+    if (cardPosition !== -1) {
+      setPlayerData(previous => {
+        const updated = [...previous]
+
+        updated[currentPlayer] = {
+          ...updated[currentPlayer],
+          position: cardPosition
+        }
+
+        return updated
+      })
+    }
+  }
 
   setCardNumber(number)
   setSelectedCard(type)
