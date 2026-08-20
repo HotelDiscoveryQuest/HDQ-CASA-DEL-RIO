@@ -3701,58 +3701,61 @@ if (screen === 'reward') {
       return
     }
 
-    /*
-    =========================================
-    SOLO MODE
-    =========================================
-    */
+   /*
+=========================================
+SOLO MODE
+=========================================
+*/
 
-    if (
-      pointMode === 'solo'
-    ) {
+if (
+  pointMode === 'solo'
+) {
 
-      const updated =
-        [...playerData]
+  const updated =
+    [...playerData]
 
-      updated[currentPlayer] = {
-        ...updated[currentPlayer],
-        points: 0
-      }
+  updated[currentPlayer] = {
+    ...updated[currentPlayer],
+    points: 0
+  }
 
-      setPlayerData(
-        updated
+  setPlayerData(
+    updated
+  )
+
+  /*
+  SAVE GAME
+  */
+
+  if (gameId) {
+
+    const saved =
+      await saveGameToSupabase(
+        gameId,
+        pointMode,
+        updated,
+        round
       )
 
-      /*
-      SAVE GAME
-      */
+    if (!saved) {
 
-      if (gameId) {
-        const saved =
-  await saveGameToSupabase(
-    gameId,
-    pointMode,
-    playerData,
-    round
-  )
-
-if (!saved) {
-  alert(
-    '❌ Could not save the game.'
-  )
-
-  return
-}
-
-alert(
-  '💾 Game saved successfully!\n\n' +
-  'Your points, position, round and progress have been saved.'
-)
-
-setScreen('home')
+      alert(
+        '❌ Could not save the game.'
+      )
 
       return
     }
+  }
+
+  alert(
+    '🎉 Reward claimed successfully!\n\n' +
+    'Your points have been reset to 0.'
+  )
+
+  setScreen('home')
+
+  return
+}
 
     /*
     =========================================
