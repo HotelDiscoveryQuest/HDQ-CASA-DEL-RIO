@@ -1073,9 +1073,13 @@ FULL WEBSITE URL
 */
 
 if (!cardId) {
+
   try {
+
     const url =
-      new URL(decodedText.trim())
+      new URL(
+        decodedText.trim()
+      )
 
     const value =
       url.searchParams
@@ -1086,6 +1090,7 @@ if (!cardId) {
     if (value) {
       cardId = value
     }
+
   } catch {
     // Not a URL
   }
@@ -1422,8 +1427,8 @@ if (!player) {
   =========================================
   */
 
-  return () => {
-  if (showScanner) {
+ return () => {
+  if (scanner.isScanning) {
     scanner
       .stop()
       .catch(() => {})
