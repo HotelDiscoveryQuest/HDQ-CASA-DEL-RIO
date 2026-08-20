@@ -154,8 +154,6 @@ const [answer, setAnswer] = useState('')
 
 const [timeLeft, setTimeLeft] = useState(60)
 
-const [cardNumber, setCardNumber] = useState(0)
-const currentPlayerInfo =
   playerData[currentPlayer]
 
 /*
