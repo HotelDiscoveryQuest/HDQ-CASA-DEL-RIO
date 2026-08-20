@@ -2493,196 +2493,244 @@ finishCard()
  */
 
 function showPenaltyCard() {
-const penaltyCards = [
-{
-text:
-'UNLUCKY! Move backward by the number you roll.',
-points: -2,
-moveBackward: true
-},
-{
-text:
-'SKIP TURN! Skip your next turn.',
-points: -2,
-moveBackward: false
-},
-{
-text:
-'LOSE POINT! Name one local food and lose 5 points.',
-points: -5,
-moveBackward: false
-},
-{
-text:
-'UNLUCKY! Name 2 nearby attractions and lose 2 points.',
-points: -2,
-moveBackward: false
-},
-{
-text:
-'LATE ARRIVAL! Lose 5 points.',
-points: -5,
-moveBackward: false
-},
-{
-text:
-'PENALTY! Lose 10 points.',
-points: -10,
-moveBackward: false
-},
-{
-text:
-'ROOM NOT READY! Lose 3 points.',
-points: -3,
-moveBackward: false
-},
-{
-text:
-'YOU FORGOT YOUR ROOM KEY! Lose 4 points.',
-points: -4,
-moveBackward: false
-},
-{
-text:
-'LATE CHECK-IN! Lose 5 points.',
-points: -5,
-moveBackward: false
-},
-{
-text:
-'YOU LEFT YOUR ROOM MESSY! Lose 3 points.',
-points: -3,
-moveBackward: false
-},
-{
-text:
-'UNLUCKY! Move backward 2 spaces.',
-points: -2,
-moveBackward: true
-},
-{
-text:
-'BAD LUCK! Lose 8 points.',
-points: -8,
-moveBackward: false
-}
-]
 
-const card =
-penaltyCards[
-Math.floor(
-Math.random() *
-penaltyCards.length
-)
-]
-
-addPoints(
-card.points
-)
-
-if (
-!card.moveBackward
-) {
-alert(
-`⚠️ PENALTY!\n\n` +
-`${card.text}\n\n` +
-`${card.points} points`
-)
-
-finishCard()
-
-return
-}
-
-const dice = prompt(
-'🎲 UNLUCKY!\n\nEnter the number you rolled (1-6):'
-)
-
-if (!dice) return
-
-const steps =
-Number(dice)
-
-if (
-!steps ||
-steps < 1 ||
-steps > 6
-) {
-alert(
-'⚠️ Please enter a number from 1 to 6.'
-)
-return
-}
-
-const player =
-  playerData[currentPlayer]
-
-if (!player) {
-  alert(
-    '⚠️ Player data could not be found.'
-  )
-  return
-}
-
-const card =
-  penaltyCards[
-    Math.floor(
-      Math.random() *
-      penaltyCards.length
-    )
+  const penaltyCards = [
+    {
+      text:
+        'UNLUCKY! Move backward by the number you roll.',
+      points: -2,
+      moveBackward: true
+    },
+    {
+      text:
+        'SKIP TURN! Skip your next turn.',
+      points: -2,
+      moveBackward: false
+    },
+    {
+      text:
+        'LOSE POINT! Name one local food and lose 5 points.',
+      points: -5,
+      moveBackward: false
+    },
+    {
+      text:
+        'UNLUCKY! Name 2 nearby attractions and lose 2 points.',
+      points: -2,
+      moveBackward: false
+    },
+    {
+      text:
+        'LATE ARRIVAL! Lose 5 points.',
+      points: -5,
+      moveBackward: false
+    },
+    {
+      text:
+        'PENALTY! Lose 10 points.',
+      points: -10,
+      moveBackward: false
+    },
+    {
+      text:
+        'ROOM NOT READY! Lose 3 points.',
+      points: -3,
+      moveBackward: false
+    },
+    {
+      text:
+        'YOU FORGOT YOUR ROOM KEY! Lose 4 points.',
+      points: -4,
+      moveBackward: false
+    },
+    {
+      text:
+        'LATE CHECK-IN! Lose 5 points.',
+      points: -5,
+      moveBackward: false
+    },
+    {
+      text:
+        'YOU LEFT YOUR ROOM MESSY! Lose 3 points.',
+      points: -3,
+      moveBackward: false
+    },
+    {
+      text:
+        'UNLUCKY! Move backward 2 spaces.',
+      points: -2,
+      moveBackward: true
+    },
+    {
+      text:
+        'BAD LUCK! Lose 8 points.',
+      points: -8,
+      moveBackward: false
+    }
   ]
 
-const steps =
-  Math.abs(card.points)
+  /*
+  =========================================
+  SELECT RANDOM PENALTY
+  =========================================
+  */
 
-let newPosition =
-  player.position - steps
+  const card =
+    penaltyCards[
+      Math.floor(
+        Math.random() *
+        penaltyCards.length
+      )
+    ]
 
-if (
-newPosition < 0
-) {
-newPosition =
-board.length +
-newPosition
-}
+  /*
+  =========================================
+  DEDUCT POINTS
+  =========================================
+  */
 
-setPlayerData(
-previous => {
-const updated = [
-...previous
-]
+  addPoints(card.points)
 
-updated[currentPlayer] = {
-...updated[currentPlayer],
-position:
-newPosition
-}
+  /*
+  =========================================
+  NORMAL PENALTY
+  =========================================
+  */
 
-return updated
-}
-)
+  if (!card.moveBackward) {
 
-alert(
-`⚠️ PENALTY!\n\n` +
-`${card.text}\n\n` +
-`${card.points} points\n\n` +
-`↩️ Moved backward ${steps} spaces.\n\n` +
-`📍 Position ${newPosition}.\n` +
-`🏨 ${board[newPosition].name}`
-)
+    alert(
+      `⚠️ PENALTY!\n\n` +
+      `${card.text}\n\n` +
+      `${card.points} points`
+    )
 
-setTimeout(() => {
-const landedType =
-board[newPosition].type
+    finishCard()
 
-if (landedType) {
-chooseLandedCard(
-landedType
-)
-} else {
-finishCard()
-}
-}, 100)
+    return
+  }
+
+  /*
+  =========================================
+  MOVE BACKWARD PENALTY
+  =========================================
+  */
+
+  const dice = prompt(
+    '🎲 UNLUCKY!\n\nEnter the number you rolled (1-6):'
+  )
+
+  if (!dice) {
+    return
+  }
+
+  const steps =
+    Number(dice)
+
+  if (
+    !steps ||
+    steps < 1 ||
+    steps > 6
+  ) {
+
+    alert(
+      '⚠️ Please enter a number from 1 to 6.'
+    )
+
+    return
+  }
+
+  /*
+  =========================================
+  GET CURRENT PLAYER
+  =========================================
+  */
+
+  const player =
+    playerData[currentPlayer]
+
+  if (!player) {
+
+    alert(
+      '⚠️ Player data could not be found.'
+    )
+
+    return
+  }
+
+  /*
+  =========================================
+  CALCULATE NEW POSITION
+  =========================================
+  */
+
+  let newPosition =
+    player.position - steps
+
+  if (newPosition < 0) {
+
+    newPosition =
+      board.length + newPosition
+  }
+
+  /*
+  =========================================
+  UPDATE PLAYER POSITION
+  =========================================
+  */
+
+  setPlayerData(previous => {
+
+    const updated = [
+      ...previous
+    ]
+
+    updated[currentPlayer] = {
+      ...updated[currentPlayer],
+      position: newPosition
+    }
+
+    return updated
+  })
+
+  /*
+  =========================================
+  SHOW RESULT
+  =========================================
+  */
+
+  alert(
+    `⚠️ PENALTY!\n\n` +
+    `${card.text}\n\n` +
+    `${card.points} points\n\n` +
+    `↩️ Moved backward ${steps} spaces.\n\n` +
+    `📍 Position ${newPosition}.\n` +
+    `🏨 ${board[newPosition].name}`
+  )
+
+  /*
+  =========================================
+  OPEN NEW LANDED SPACE
+  =========================================
+  */
+
+  setTimeout(() => {
+
+    const landedType =
+      board[newPosition].type
+
+    if (landedType) {
+
+      chooseLandedCard(
+        landedType
+      )
+
+    } else {
+
+      finishCard()
+    }
+
+  }, 100)
 }
 
 /*
