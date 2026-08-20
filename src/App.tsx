@@ -2623,7 +2623,20 @@ if (!player) {
   )
   return
 }
-steps
+
+const card =
+  penaltyCards[
+    Math.floor(
+      Math.random() *
+      penaltyCards.length
+    )
+  ]
+
+const steps =
+  Math.abs(card.points)
+
+let newPosition =
+  player.position - steps
 
 if (
 newPosition < 0
