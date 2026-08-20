@@ -1022,11 +1022,15 @@ useEffect(() => {
 
     async (decodedText) => {
 
-      console.log(
-        'QR SCANNED:',
-        decodedText
-      )
+  alert(
+    'QR DETECTED:\n\n' +
+    decodedText
+  )
 
+  console.log(
+    'QR SCANNED:',
+    decodedText
+  )
       /*
       =========================================
       GET CARD ID
