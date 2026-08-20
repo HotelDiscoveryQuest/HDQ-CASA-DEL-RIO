@@ -2614,13 +2614,15 @@ alert(
 return
 }
 
-const currentPlayerInfo =
-playerData[currentPlayer]
+const player =
+  playerData[currentPlayer]
 
-if (!player) return
-
-let newPosition =
-player.position -
+if (!player) {
+  alert(
+    '⚠️ Player data could not be found.'
+  )
+  return
+}
 steps
 
 if (
