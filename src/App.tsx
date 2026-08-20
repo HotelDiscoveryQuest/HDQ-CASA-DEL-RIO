@@ -101,11 +101,14 @@ useState(false)
 const [gameId, setGameId] = useState('')
 
 // QR card detected from physical card
-const [qrCardType, setQrCardType] =
-useState<CardType | 'START' | null>(null)
 const [showScanner, setShowScanner] =
-useState(false)
+  useState(false)
 
+const [qrCardType, setQrCardType] =
+  useState<CardType | 'START' | null>(null)
+
+const [cardNumber, setCardNumber] =
+  useState(0)
 
 const [players, setPlayers] = useState(1)
 
@@ -999,367 +1002,497 @@ rewardClaimed
 CAMERA QR SCANNER
 =========================================
 */
-useEffect(() => {
-if (!showScanner) return
-
-const scanner = new Html5Qrcode('qr-reader')
-
-scanner.start(
-{ facingMode: 'environment' },
-{
-fps: 10,
-qrbox: { width: 250, height: 250 }
-},
-async (decodedText) => {
-console.log('QR SCANNED:', decodedText)
-
-let cardId: string | null = null
-
-/*
-     =========================================
-     FORMAT 1
-     HDQ:A1
-     HDQ:G1
-     HDQ:D1
-     HDQ:C1
-     HDQ:P1
-     =========================================
-     */
-
-if (
-decodedText
-.trim()
-.toUpperCase()
-.startsWith('HDQ:')
-) {
-cardId =
-decodedText
-.trim()
-.substring(4)
-.toUpperCase()
-}
-
-/*
-     =========================================
-     FORMAT 2
-     FULL URL
-
-     Example:
-     https://yourwebsite.com/?card=A1
-     =========================================
-     */
-
-if (!cardId) {
-try {
-const url =
-new URL(
-decodedText.trim()
-)
-
-const value =
-url.searchParams
-.get('card')
-?.toUpperCase()
-
-if (value) {
-cardId = value
-}
-} catch {
-// Not a URL
-}
-}
-
-/*
-=========================================
-CHECK CARD ID
-=========================================
-*/
-
-if (!cardId) {
-alert(
-`❌ Invalid Hotel Discovery Quest QR.\n\n` +
-`Scanned:\n${decodedText}`
-)
-
-return
-}
-
-/*
-=========================================
-CHECK CARD FORMAT
-=========================================
-
-A = Attraction
-G = Challenge
-D = Discovery
-C = Chance
-P = Penalty
-
-Examples:
-A1
-A2
-G1
-D1
-C1
-P1
-=========================================
-*/
-
-const match =
-cardId.match(
-/^(A|G|D|C|P)(\d+)$/
-)
-
-if (!match) {
-alert(
-`❌ Invalid card number.\n\n` +
-`Scanned card: ${cardId}\n\n` +
-`Example valid cards:\n` +
-`A1, A2, G1, D1, C1, P1`
-)
-
-return
-}
-
-const cardType =
-match[1] as CardType
-
-const cardNumber =
-Number(match[2])
-
-console.log(
-'CARD TYPE:',
-cardType
-)
-
-console.log(
-'CARD NUMBER:',
-cardNumber
-)
-
-/*
-=========================================
-CARD SCANNED SUCCESSFULLY
-=========================================
-*/
-
-setCardNumber(cardNumber)
-setSelectedCard(cardType)
-setAnswer('')
-
-
-/*
-=========================================
-STOP CAMERA
-=========================================
-*/
-
-await scanner.stop()
-
-setShowScanner(false)
-
-/*
-=========================================
-SAVE SCANNED CARD
-=========================================
-*/
-
-setQrCardType(cardType)
-setCardNumber(cardNumber)
-
-chooseLandedCard(
-cardType,
-cardNumber
-)
-/*
-=========================================
-GET RANDOM QUESTION AFTER SCAN
-=========================================
-*/
-
-if (
-cardType === 'A' ||
-cardType === 'G' ||
-cardType === 'D'
-) {
-const question =
-getRandomQuestionForCard(cardType)
-
-if (!question) {
-alert(
-'⚠️ No question found for this card.'
-)
-return
-}
-
-setCurrentQuestion(question)
-
-setTimeLeft(question.time)
-
-if (cardType === 'A') {
-setScreen('question')
-}
-
-if (cardType === 'G') {
-setScreen('challenge')
-}
-
-if (cardType === 'D') {
-setScreen('discovery')
-}
-
-return
-}
-
-/*
-=========================================
-CHANCE CARD
-=========================================
-*/
-
-if (cardType === 'C') {
-showChanceCard()
-return
-}
-
-/*
-=========================================
-PENALTY CARD
-=========================================
-*/
-
-if (cardType === 'P') {
-showPenaltyCard()
-return
-}
-
-/*
-     =========================================
-     NEXT STEP
-     =========================================
-
-     We will add the random question
-     based on Round / Level here.
-     =========================================
-     */
-
-},
-() => {
-// Ignore normal camera scanning errors
-}
-).catch(() => {
-alert(
-'⚠️ Camera could not be opened. Please allow camera permission.'
-)
-
-setShowScanner(false)
-})
-
-return () => {
-scanner
-.stop()
-.catch(() => {})
-}
-}, [showScanner])
-
-/*
-=========================================
-QR URL → QUESTION
-=========================================
-*/
 
 useEffect(() => {
-const params = new URLSearchParams(
-window.location.search
-)
 
-const card =
-params.get('card')?.toUpperCase()
+  if (!showScanner) {
+    return
+  }
 
-if (!card) return
+  const scanner =
+    new Html5Qrcode('qr-reader')
 
-const match =
-card.match(/^(A|G|D|C|P)(\d+)$/)
+  scanner.start(
+    { facingMode: 'environment' },
 
-if (!match) return
+    {
+      fps: 10,
+      qrbox: {
+        width: 250,
+        height: 250
+      }
+    },
 
-const cardType =
-match[1] as CardType
+    async (decodedText) => {
 
-const cardNumber =
-Number(match[2])
+      console.log(
+        'QR SCANNED:',
+        decodedText
+      )
 
-console.log(
-'QR CARD:',
-cardType,
-cardNumber
-)
+      /*
+      =========================================
+      GET CARD ID
+      =========================================
+      */
 
-setQrCardType(cardType)
-setCardNumber(cardNumber)
-setSelectedCard(cardType)
-setAnswer('')
+      let cardId: string | null = null
 
-if (cardType === 'A') {
-const question =
-getRandomQuestionForCard('A')
+      /*
+      =========================================
+      FORMAT 1
+      HDQ:A1
+      HDQ:G1
+      HDQ:D1
+      HDQ:C1
+      HDQ:P1
+      =========================================
+      */
 
-if (!question) {
-alert(
-'⚠️ No Attraction question found.'
-)
-return
-}
+      const scannedText =
+        decodedText
+          .trim()
+          .toUpperCase()
 
-setCurrentQuestion(question)
-setTimeLeft(question.time)
-setScreen('question')
-return
-}
+      if (
+        scannedText.startsWith('HDQ:')
+      ) {
 
-if (cardType === 'G') {
-const question =
-getRandomQuestionForCard('G')
+        cardId =
+          scannedText.substring(4)
+      }
 
-if (!question) {
-alert(
-'⚠️ No Challenge question found.'
-)
-return
-}
+      /*
+      =========================================
+      FORMAT 2
+      FULL URL
 
-setCurrentQuestion(question)
-setTimeLeft(question.time)
-setScreen('challenge')
-return
-}
+      Example:
+      https://yourwebsite.com/?card=A1
+      =========================================
+      */
 
-if (cardType === 'D') {
-const question =
-getRandomQuestionForCard('D')
+      if (!cardId) {
 
-if (!question) {
-alert(
-'⚠️ No Discovery question found.'
-)
-return
-}
+        try {
 
-setCurrentQuestion(question)
-setTimeLeft(question.time)
-setScreen('discovery')
-return
-}
+          const url =
+            new URL(
+              decodedText.trim()
+            )
 
-if (cardType === 'C') {
-showChanceCard()
-return
-}
+          const value =
+            url.searchParams
+              .get('card')
+              ?.trim()
+              .toUpperCase()
 
-if (cardType === 'P') {
-showPenaltyCard()
-return
-}
+          if (value) {
+            cardId = value
+          }
+
+        } catch {
+          // Not a URL
+        }
+      }
+
+      /*
+      =========================================
+      CHECK CARD ID
+      =========================================
+      */
+
+      if (!cardId) {
+
+        alert(
+          `❌ Invalid Hotel Discovery Quest QR.\n\n` +
+          `Scanned:\n${decodedText}`
+        )
+
+        return
+      }
+
+      /*
+      =========================================
+      CHECK CARD FORMAT
+      =========================================
+
+      A = Attraction
+      G = Challenge
+      D = Discovery
+      C = Chance
+      P = Penalty
+
+      Examples:
+      A1
+      A2
+      G1
+      D1
+      C1
+      P1
+      =========================================
+      */
+
+      const match =
+        cardId.match(
+          /^(A|G|D|C|P)(\d+)$/
+        )
+
+      if (!match) {
+
+        alert(
+          `❌ Invalid card number.\n\n` +
+          `Scanned card: ${cardId}\n\n` +
+          `Example valid cards:\n` +
+          `A1, A2, G1, D1, C1, P1`
+        )
+
+        return
+      }
+
+      /*
+      =========================================
+      GET CARD TYPE
+      =========================================
+      */
+
+      const cardType =
+        match[1] as CardType
+
+      /*
+      =========================================
+      GET CARD NUMBER
+      =========================================
+      */
+
+      const cardNumber =
+        Number(match[2])
+
+      console.log(
+        'CARD TYPE:',
+        cardType
+      )
+
+      console.log(
+        'CARD NUMBER:',
+        cardNumber
+      )
+
+      /*
+      =========================================
+      GET CURRENT PLAYER
+      =========================================
+      */
+
+      const player =
+        playerData[currentPlayer]
+
+      if (!player) {
+
+        alert(
+          '❌ Player information could not be found.'
+        )
+
+        return
+      }
+
+      /*
+      =========================================
+      GET CURRENT BOARD SPACE
+      =========================================
+      */
+
+      const currentSpace =
+        board[player.position]
+
+      if (!currentSpace) {
+
+        alert(
+          '❌ Current board position could not be found.'
+        )
+
+        return
+      }
+
+      /*
+      =========================================
+      CHECK CHANCE CARD
+      =========================================
+
+      Chance cards can be scanned directly.
+      =========================================
+      */
+
+      if (cardType === 'C') {
+
+        setQrCardType(cardType)
+        setCardNumber(cardNumber)
+        setSelectedCard(cardType)
+
+        try {
+          await scanner.stop()
+        } catch {
+          // Scanner already stopped
+        }
+
+        setShowScanner(false)
+
+        showChanceCard()
+
+        return
+      }
+
+      /*
+      =========================================
+      CHECK PENALTY CARD
+      =========================================
+
+      Penalty cards can be scanned directly.
+      =========================================
+      */
+
+      if (cardType === 'P') {
+
+        setQrCardType(cardType)
+        setCardNumber(cardNumber)
+        setSelectedCard(cardType)
+
+        try {
+          await scanner.stop()
+        } catch {
+          // Scanner already stopped
+        }
+
+        setShowScanner(false)
+
+        showPenaltyCard()
+
+        return
+      }
+
+      /*
+      =========================================
+      CHECK CARD TYPE
+      =========================================
+      */
+
+      if (
+        !currentSpace.type ||
+        currentSpace.type !== cardType
+      ) {
+
+        alert(
+          `⚠️ WRONG CARD!\n\n` +
+
+          `You are currently on:\n` +
+          `📍 ${currentSpace.name}\n\n` +
+
+          `Expected card type:\n` +
+          `🎴 ${currentSpace.type || 'None'}\n\n` +
+
+          `You scanned:\n` +
+          `📷 ${cardId}\n\n` +
+
+          `Please scan the correct physical card.`
+        )
+
+        return
+      }
+
+      /*
+      =========================================
+      CHECK EXACT CARD NUMBER
+      =========================================
+      */
+
+      const expectedCardNumber =
+        getCardNumber(
+          player.position,
+          currentSpace.type
+        )
+
+      if (
+        expectedCardNumber !==
+        cardNumber
+      ) {
+
+        alert(
+          `⚠️ WRONG CARD!\n\n` +
+
+          `You are currently on:\n` +
+          `📍 ${currentSpace.name}\n\n` +
+
+          `Expected card:\n` +
+          `🎴 ${currentSpace.type}${expectedCardNumber}\n\n` +
+
+          `You scanned:\n` +
+          `📷 ${cardId}\n\n` +
+
+          `Please scan the correct physical card.`
+        )
+
+        return
+      }
+
+      /*
+      =========================================
+      CARD IS CORRECT
+      =========================================
+      */
+
+      console.log(
+        '✅ CORRECT CARD:',
+        cardId
+      )
+
+      console.log(
+        '👤 PLAYER:',
+        player.name
+      )
+
+      console.log(
+        '🆔 PLAYER ID:',
+        player.playerId
+      )
+
+      /*
+      =========================================
+      SAVE CARD INFORMATION
+      =========================================
+      */
+
+      setQrCardType(cardType)
+
+      setCardNumber(cardNumber)
+
+      setSelectedCard(cardType)
+
+      setAnswer('')
+
+      /*
+      =========================================
+      STOP CAMERA
+      =========================================
+      */
+
+      try {
+
+        await scanner.stop()
+
+      } catch {
+        // Scanner already stopped
+      }
+
+      setShowScanner(false)
+
+      /*
+      =========================================
+      OPEN CARD
+      =========================================
+
+      chooseLandedCard() will:
+      • select the random question
+      • check the current round
+      • determine the difficulty
+      • start the timer
+      • open the correct screen
+      =========================================
+      */
+
+      chooseLandedCard(
+        cardType,
+        cardNumber
+      )
+    },
+
+    () => {
+      // Ignore normal camera scanning errors
+    }
+
+  ).catch(() => {
+
+    alert(
+      '⚠️ Camera could not be opened. ' +
+      'Please allow camera permission.'
+    )
+
+    setShowScanner(false)
+  })
+
+  /*
+  =========================================
+  CLEAN UP CAMERA
+  =========================================
+  */
+
+  return () => {
+
+    scanner
+      .stop()
+      .catch(() => {})
+
+  }
+
+}, [
+  showScanner,
+  currentPlayer,
+  playerData,
+  round
+])
+
+/*
+=========================================
+QR URL → CARD
+=========================================
+*/
+
+useEffect(() => {
+  const params = new URLSearchParams(
+    window.location.search
+  )
+
+  const card =
+    params.get('card')?.toUpperCase()
+
+  if (!card) {
+    return
+  }
+
+  const match =
+    card.match(
+      /^(A|G|D|C|P)(\d+)$/
+    )
+
+  if (!match) {
+    alert(
+      `❌ Invalid QR card: ${card}`
+    )
+    return
+  }
+
+  const cardType =
+    match[1] as CardType
+
+  const cardNumber =
+    Number(match[2])
+
+  console.log(
+    'QR URL CARD:',
+    cardType,
+    cardNumber
+  )
+
+  /*
+  =========================================
+  OPEN CARD
+  =========================================
+  */
+
+  chooseLandedCard(
+    cardType,
+    cardNumber
+  )
+
 }, [])
 
 /*
@@ -1847,31 +1980,27 @@ return null
 }
 
 /*
- =========================================
- ROUND → DIFFICULTY
- =========================================
+=========================================
+ROUND → DIFFICULTY
+=========================================
 
- Round 1–4   = Easy
- Round 5–10  = Medium
- Round 11–14 = Hard
- Round 15+   = Extreme
- =========================================
- */
+Round 1 = Easy
+Round 2 = Medium
+Round 3+ = Hard
+=========================================
+*/
 
 let difficulty:
-| 'Easy'
-| 'Medium'
-| 'Hard'
-| 'Extreme'
+  | 'Easy'
+  | 'Medium'
+  | 'Hard'
 
-if (round <= 4) {
-difficulty = 'Easy'
-} else if (round <= 10) {
-difficulty = 'Medium'
-} else if (round <= 14) {
-difficulty = 'Hard'
+if (round === 1) {
+  difficulty = 'Easy'
+} else if (round === 2) {
+  difficulty = 'Medium'
 } else {
-difficulty = 'Extreme'
+  difficulty = 'Hard'
 }
 
 /*
@@ -1915,128 +2044,132 @@ CHOOSE LANDED CARD
 */
 
 function chooseLandedCard(
-type: CardType,
-scannedNumber?: number
+  type: CardType,
+  scannedNumber?: number
 ) {
-const player = playerData[currentPlayer]
+  const player = playerData[currentPlayer]
 
-if (!player) {
-alert('⚠️ Player data could not be found.')
-return
+  if (!player) {
+    alert('⚠️ Player data could not be found.')
+    return
+  }
+
+  /*
+  =========================================
+  CARD NUMBER
+  =========================================
+  */
+
+  const number =
+    scannedNumber ??
+    getCardNumber(
+      player.position,
+      type
+    )
+
+  setCardNumber(number)
+  setSelectedCard(type)
+  setQrCardType(type)
+  setAnswer('')
+
+  /*
+  =========================================
+  ATTRACTION
+  =========================================
+  */
+
+  if (type === 'A') {
+
+    const question =
+      getRandomQuestionForCard('A')
+
+    if (!question) {
+      alert(
+        '⚠️ No Attraction question found.'
+      )
+      return
+    }
+
+    setCurrentQuestion(question)
+    setTimeLeft(question.time)
+    setScreen('question')
+
+    return
+  }
+
+  /*
+  =========================================
+  CHALLENGE
+  =========================================
+  */
+
+  if (type === 'G') {
+
+    const question =
+      getRandomQuestionForCard('G')
+
+    if (!question) {
+      alert(
+        '⚠️ No Challenge question found.'
+      )
+      return
+    }
+
+    setCurrentQuestion(question)
+    setTimeLeft(question.time)
+    setScreen('challenge')
+
+    return
+  }
+
+  /*
+  =========================================
+  DISCOVERY
+  =========================================
+  */
+
+  if (type === 'D') {
+
+    const question =
+      getRandomQuestionForCard('D')
+
+    if (!question) {
+      alert(
+        '⚠️ No Discovery question found.'
+      )
+      return
+    }
+
+    setCurrentQuestion(question)
+    setTimeLeft(question.time)
+    setScreen('discovery')
+
+    return
+  }
+
+  /*
+  =========================================
+  CHANCE
+  =========================================
+  */
+
+  if (type === 'C') {
+    showChanceCard()
+    return
+  }
+
+  /*
+  =========================================
+  PENALTY
+  =========================================
+  */
+
+  if (type === 'P') {
+    showPenaltyCard()
+    return
+  }
 }
-/*
- =========================================
- CARD NUMBER
- =========================================
- */
-
-const number =
-scannedNumber ??
-getCardNumber(
-player.position,
-type
-)
-
-setCardNumber(number)
-setSelectedCard(type)
-setAnswer('')
-
-/*
- =========================================
- ATTRACTION
- =========================================
- */
-
-if (qrCardType === 'A') { 
-
-const question =
-getRandomQuestionForCard('A')
-
-if (!question) {
-alert(
-'⚠️ No Attraction question found.'
-)
-return
-}
-
-setCurrentQuestion(question)
-setTimeLeft(question.time)
-setScreen('question')
-
-return
-}
-
-/*
- =========================================
- CHALLENGE
- =========================================
- */
-
-if (qrCardType === 'G') {
-const question =
-getRandomQuestionForCard('G')
-
-if (!question) {
-alert(
-'⚠️ No Challenge question found.'
-)
-return
-}
-
-setCurrentQuestion(question)
-setTimeLeft(question.time)
-setScreen('challenge')
-
-return
-}
-
-/*
- =========================================
- DISCOVERY
- =========================================
- */
-
-if (qrCardType === 'D') {
-
-const question =
-getRandomQuestionForCard('D')
-
-if (!question) {
-alert(
-'⚠️ No Discovery question found.'
-)
-return
-}
-
-setCurrentQuestion(question)
-setTimeLeft(question.time)
-setScreen('discovery')
-
-return
-}
-
-/*
-=========================================
-CHANCE
-=========================================
-*/
-
-if (qrCardType === 'C') {
-showChanceCard()
-return
-}
-
-/*
-=========================================
-PENALTY
-=========================================
-*/
-
-if (qrCardType === 'P') {
-showPenaltyCard()
-return
-}
-}
+  
 /*
  =========================================
  CHECK ANSWERS
@@ -2244,20 +2377,26 @@ FINISH CARD
 */
 
 function finishCard() {
-setAnswer('')
-setCurrentQuestion(null)
-setSelectedCard(null)
-setTimeLeft(0)
+  setAnswer('')
+  setCurrentQuestion(null)
+  setSelectedCard(null)
+  setQrCardType(null)
+  setTimeLeft(0)
 
-if (players > 1) {
-setCurrentPlayer(previous => {
-return (previous + 1) % players
-})
+  /*
+  =========================================
+  NEXT PLAYER
+  =========================================
+  */
+
+  if (players > 1) {
+    setCurrentPlayer(previous => {
+      return (previous + 1) % players
+    })
+  }
+
+  setScreen('board')
 }
-
-setScreen('board')
-}
-
 /*
  =========================================
  CHANCE CARDS
@@ -2944,58 +3083,43 @@ if (screen === 'board') {
           </h2>
 
           {!showScanner && (
-            <>
-              <p>
-                Scan the QR code on the
-                physical card to continue.
-              </p>
+  <>
+    <p>
+      Scan the QR code on the physical card
+      to continue.
+    </p>
 
-              <button
-                onClick={() => {
-  setShowScanner(true)
-}}
-              >
-                📷 Scan Card QR Code
-              </button>
-            </>
-          )}
+    <button
+      onClick={() =>
+        setShowScanner(true)
+      }
+    >
+      📷 Scan Card QR Code
+    </button>
+  </>
+)}
+        {showScanner && (
+  <>
+    <h3>📷 Camera Scanner</h3>
 
-          {showScanner && (
-            <>
+    <div
+      id="qr-reader"
+      style={{
+        width: '100%',
+        maxWidth: '500px',
+        margin: '20px auto'
+      }}
+    ></div>
 
-              <h3>
-                📷 Camera Scanner
-              </h3>
-
-              <p>
-                Point your camera at the
-                QR code on the physical card.
-              </p>
-
-              <div
-                id="qr-reader"
-                style={{
-                  width: '100%',
-                  maxWidth: '500px',
-                  margin: '20px auto',
-                  padding: '10px',
-                  backgroundColor: 'white',
-                  color: 'black',
-                  borderRadius: '15px',
-                  border: '3px solid black'
-                }}
-              ></div>
-
-              <button
-                onClick={() =>
-                  setShowScanner(false)
-                }
-              >
-                ❌ Close Scanner
-              </button>
-
-            </>
-          )}
+    <button
+      onClick={() =>
+        setShowScanner(false)
+      }
+    >
+      ❌ Close Scanner
+    </button>
+  </>
+)}
 
         </div>
 
