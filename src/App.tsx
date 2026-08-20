@@ -1447,12 +1447,12 @@ if (!player) {
   */
 
   return () => {
-
+  if (showScanner) {
     scanner
       .stop()
       .catch(() => {})
-
   }
+}
 
 }, [
   showScanner,
