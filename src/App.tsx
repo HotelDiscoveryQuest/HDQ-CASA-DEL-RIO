@@ -128,21 +128,25 @@ const [currentPlayer, setCurrentPlayer] =
 useState(0)
 
 const [playerData, setPlayerData] =
-useState<PlayerData[]>([
-{
-name: '',
-playerId: '',
-points: 0,
-position: 0,
-usedQuestions: {
-A: [],
-G: [],
-D: []
-}
-}
-])
+  useState<PlayerData[]>([
+    {
+      name: '',
+      playerId: '',
+      points: 0,
+      position: 0,
+      usedQuestions: {
+        A: [],
+        G: [],
+        D: []
+      }
+    }
+  ])
 
-const [round, setRound] = useState(1)
+const currentPlayerInfo =
+  playerData[currentPlayer]
+
+const [round, setRound] =
+  useState(1)
 
 const [, setSelectedCard] =
 useState<CardType | null>(null)
@@ -153,8 +157,6 @@ useState<Question | null>(null)
 const [answer, setAnswer] = useState('')
 
 const [timeLeft, setTimeLeft] = useState(60)
-
-  playerData[currentPlayer]
 
 /*
  =========================================
@@ -1179,7 +1181,7 @@ useEffect(() => {
       =========================================
       */
 
-      const player =
+      const currentPlayerInfo =
         playerData[currentPlayer]
 
       if (!player) {
@@ -2038,7 +2040,7 @@ function chooseLandedCard(
   type: CardType,
   scannedNumber?: number
 ) {
-  const player = playerData[currentPlayer]
+  const currentPlayerInfo == playerData[currentPlayer]
 
   if (!player) {
     alert('⚠️ Player data could not be found.')
@@ -2612,7 +2614,7 @@ alert(
 return
 }
 
-const player =
+const currentPlayerInfo =
 playerData[currentPlayer]
 
 if (!player) return
