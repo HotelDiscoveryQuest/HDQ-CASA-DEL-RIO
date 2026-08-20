@@ -83,17 +83,18 @@ description:
 }
 ]
 function App() {
-type Screen =
-| 'home'
-| 'setup'
-| 'board'
-| 'question'
-| 'challenge'
-| 'discovery'
-| 'reward'
 
-const [screen, setScreen] =
-useState<Screen>('home')
+  type Screen =
+    | 'home'
+    | 'setup'
+    | 'board'
+    | 'question'
+    | 'challenge'
+    | 'discovery'
+    | 'reward'
+
+  const [screen, setScreen] =
+    useState<Screen>('home')
 const [showContinueChoice, setShowContinueChoice] =
 useState(false)
 
@@ -154,7 +155,8 @@ const [answer, setAnswer] = useState('')
 const [timeLeft, setTimeLeft] = useState(60)
 
 const [cardNumber, setCardNumber] = useState(0)
-
+const currentPlayerInfo =
+  playerData[currentPlayer]
 
 /*
  =========================================
@@ -2824,240 +2826,245 @@ setHasPlayedBefore(null)
  =========================================
  */
 
-if (
-screen === 'board'
-) {
-const position =
-currentPlayerInfo
-?.position || 0
+if (screen === 'board') {
 
-const currentSpace =
-board[position]
+  const position =
+    currentPlayerInfo?.position || 0
 
-return (
-<div className="home">
+  const currentSpace =
+    board[position]
 
-  <div className="hotel-card">
+  return (
+    <div className="home">
 
-    <h1>
-      🎲 Your Turn
-    </h1>
+      <div className="hotel-card">
 
-    <h2>
-      Round {round}
-    </h2>
+        <h1>
+          🎲 Your Turn
+        </h1>
 
-    <h3>
-      👤{' '}
-      {currentPlayerInfo?.name ||
-        `Player ${currentPlayer + 1}`}
-    </h3>
+        <h2>
+          Round {round}
+        </h2>
 
-    <p>
-      🆔 Player ID:{' '}
-      {currentPlayerInfo?.playerId}
-    </p>
+        <h3>
+          👤 {
+            currentPlayerInfo?.name ||
+            `Player ${currentPlayer + 1}`
+          }
+        </h3>
 
-    <div
-      style={{
-        backgroundColor: '#fff3cd',
-        color: '#000',
-        padding: '15px',
-        borderRadius: '12px',
-        marginTop: '10px',
-        marginBottom: '15px',
-        border: '2px solid #ffc107'
-      }}
-    >
+        <p>
+          🆔 Player ID:{' '}
+          {currentPlayerInfo?.playerId}
+        </p>
 
-      <h3>
-        🎮 Game ID
-      </h3>
+        {/* GAME ID */}
 
-      <h2>
-        {gameId}
-      </h2>
-
-      <p>
-        ⚠️ Keep this Game ID as a backup.
-      </p>
-
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(
-            gameId
-          )
-
-          alert(
-            `✅ Game ID copied!\n\n` +
-            `${gameId}\n\n` +
-            `Keep it somewhere safe.`
-          )
-        }}
-      >
-        📋 Copy Game ID
-      </button>
-
-    </div>
-
-    <p>
-      ⭐ Points:{' '}
-
-      {pointMode === 'group'
-        ? playerData.reduce(
-            (total, player) =>
-              total + player.points,
-            0
-          )
-        : currentPlayerInfo?.points || 0}
-    </p>
-
-    <hr />
-
-    <h3>
-      Your current board position:
-    </h3>
-
-    <h1>
-      {position}
-    </h1>
-
-    <h2>
-      {currentSpace.name}
-    </h2>
-
-    {currentSpace.type ? (
-  <>
-
-    <p>
-      🎴 Card Type: {currentSpace.type}
-    </p>
-
-    {/* =========================================
-        QR SCANNER
-        ========================================= */}
-
-    <div
-      style={{
-        marginTop: '20px',
-        padding: '20px',
-        backgroundColor: '#ffffff',
-        color: '#000000',
-        borderRadius: '15px',
-        border: '3px solid #000000'
-      }}
-    >
-      <h2>📷 Scan Physical Card</h2>
-
-      {!showScanner && (
-        <>
-          <p>
-            Scan the QR code on the physical card
-            to continue.
-          </p>
-
-          <button
-            onClick={() =>
-              setShowScanner(true)
-            }
-          >
-            📷 Scan Card QR Code
-          </button>
-        </>
-      )}
-
-      {showScanner && (
-        <>
+        <div
+          style={{
+            backgroundColor: '#fff3cd',
+            color: '#000',
+            padding: '15px',
+            borderRadius: '12px',
+            marginTop: '10px',
+            marginBottom: '15px',
+            border: '2px solid #ffc107'
+          }}
+        >
           <h3>
-            📷 Camera Scanner
+            🎮 Game ID
           </h3>
 
-          <p>
-            Point your camera at the QR code
-            on the physical card.
-          </p>
-
-          <div
-            id="qr-reader"
-            style={{
-              width: '100%',
-              maxWidth: '500px',
-              margin: '20px auto',
-              padding: '10px',
-              backgroundColor: 'white',
-              color: 'black',
-              borderRadius: '15px',
-              border: '3px solid black'
-            }}
-          ></div>
+          <h2>
+            {gameId}
+          </h2>
 
           <button
-            onClick={() =>
-              setShowScanner(false)
-            }
+            onClick={() => {
+
+              navigator.clipboard.writeText(
+                gameId
+              )
+
+              alert(
+                `✅ Game ID copied!\n\n${gameId}`
+              )
+            }}
           >
-            ❌ Close Scanner
+            📋 Copy Game ID
           </button>
-        </>
-      )}
+        </div>
+
+        {/* POINTS */}
+
+        <p>
+          ⭐ Points:{' '}
+
+          {pointMode === 'group'
+            ? playerData.reduce(
+                (total, player) =>
+                  total + player.points,
+                0
+              )
+            : currentPlayerInfo?.points || 0}
+        </p>
+
+        <hr />
+
+        {/* POSITION */}
+
+        <h3>
+          Your current board position:
+        </h3>
+
+        <h1>
+          {position}
+        </h1>
+
+        <h2>
+          {currentSpace.name}
+        </h2>
+
+        {/* CARD TYPE */}
+
+        {currentSpace.type && (
+          <p>
+            🎴 Card Type:{' '}
+            {currentSpace.type}
+          </p>
+        )}
+
+        {/* =====================================
+            QR SCANNER
+            ===================================== */}
+
+        <div
+          style={{
+            marginTop: '20px',
+            padding: '20px',
+            backgroundColor: '#ffffff',
+            color: '#000000',
+            borderRadius: '15px',
+            border: '3px solid #000000'
+          }}
+        >
+
+          <h2>
+            📷 Scan Physical Card
+          </h2>
+
+          {!showScanner && (
+            <>
+              <p>
+                Scan the QR code on the
+                physical card to continue.
+              </p>
+
+              <button
+                onClick={() => {
+  setShowScanner(true)
+}}
+              >
+                📷 Scan Card QR Code
+              </button>
+            </>
+          )}
+
+          {showScanner && (
+            <>
+
+              <h3>
+                📷 Camera Scanner
+              </h3>
+
+              <p>
+                Point your camera at the
+                QR code on the physical card.
+              </p>
+
+              <div
+                id="qr-reader"
+                style={{
+                  width: '100%',
+                  maxWidth: '500px',
+                  margin: '20px auto',
+                  padding: '10px',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  borderRadius: '15px',
+                  border: '3px solid black'
+                }}
+              ></div>
+
+              <button
+                onClick={() =>
+                  setShowScanner(false)
+                }
+              >
+                ❌ Close Scanner
+              </button>
+
+            </>
+          )}
+
+        </div>
+
+        <hr />
+
+        {/* =====================================
+            SAVE & EXIT
+            ===================================== */}
+
+        <button
+          onClick={async () => {
+
+            const confirmed =
+              window.confirm(
+                '💾 Save and Exit?\n\n' +
+                'Your current points and game progress will be saved.'
+              )
+
+            if (!confirmed) {
+              return
+            }
+
+            if (gameId) {
+
+              const saved =
+                await saveGameToSupabase(
+                  gameId,
+                  pointMode,
+                  playerData,
+                  round
+                )
+
+              if (!saved) {
+
+                alert(
+                  '❌ Could not save the game.'
+                )
+
+                return
+              }
+            }
+
+            alert(
+              '✅ Game saved successfully!'
+            )
+
+            setScreen('home')
+          }}
+        >
+          💾 Save & Exit
+        </button>
+
+        <hr />
+
+      </div>
+
     </div>
-
-  </>
-) : (
-  <p>
-    🏨 This is a hotel space.
-  </p>
-)}
-
-<hr />
-
-<button
-  onClick={async () => {
-
-    const confirmed =
-      window.confirm(
-        '💾 Save and Exit?\n\n' +
-        'Your current points and game progress will be saved.'
-      )
-
-    if (!confirmed) {
-      return
-    }
-
-    if (gameId) {
-
-      const saved =
-        await saveGameToSupabase(
-          gameId,
-          pointMode,
-          playerData,
-          round
-        )
-
-      if (!saved) {
-
-        alert(
-          '❌ Could not save the game.'
-        )
-
-        return
-      }
-    }
-
-    alert(
-      '✅ Game saved successfully!'
-    )
-
-    setScreen('home')
-  }}
->
-  💾 Save & Exit
-</button>
-
-</div>
-
-</div>
-)
+  )
 }
 /*
  =========================================
