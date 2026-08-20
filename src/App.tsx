@@ -2836,183 +2836,194 @@ board[position]
 
 return (
 <div className="home">
-<div className="hotel-card">
 
-<h1>
-🎲 Your Turn
-</h1>
+  <div className="hotel-card">
 
-<h2>
-Round {round}
-</h2>
+    <h1>
+      🎲 Your Turn
+    </h1>
 
-<h3>
-👤 {
-currentPlayerInfo
-?.name ||
-`Player ${currentPlayer + 1}`
-}
-</h3>
+    <h2>
+      Round {round}
+    </h2>
 
-<p>
-🆔 Player ID:{' '}
-{currentPlayerInfo?.playerId}
-</p>
+    <h3>
+      👤{' '}
+      {currentPlayerInfo?.name ||
+        `Player ${currentPlayer + 1}`}
+    </h3>
 
-<div
-style={{
-backgroundColor: '#fff3cd',
-color: '#000',
-padding: '15px',
-borderRadius: '12px',
-marginTop: '10px',
-marginBottom: '15px',
-border: '2px solid #ffc107'
-}}
->
-<h3>🎮 Game ID</h3>
-
-<h2>
-{gameId}
-</h2>
-
-<p>
-⚠️ Keep this Game ID as a backup.
-</p>
-
-<button
-onClick={() => {
-navigator.clipboard.writeText(gameId)
-
-alert(
-`✅ Game ID copied!\n\n` +
-`${gameId}\n\n` +
-`Keep it somewhere safe.`
-)
-}}
->
-📋 Copy Game ID
-</button>
-</div>
-
-<p>
-⭐ Points:{' '}
-
-{pointMode === 'group'
-? playerData.reduce(
-(total, player) =>
-total + player.points,
-0
-)
-: currentPlayerInfo?.points || 0}
-</p>
-
-<hr />
-
-<h3>
-Your current board position:
-</h3>
-
-<h1>
-{position}
-</h1>
-
-<h2>
-{currentSpace.name}
-</h2>
-
-{currentSpace.type ? (
-  <>
     <p>
-      🎴 Card Type: {currentSpace.type}
+      🆔 Player ID:{' '}
+      {currentPlayerInfo?.playerId}
     </p>
-<div
-  style={{
-    marginTop: '20px',
-    padding: '20px',
-    backgroundColor: '#ffffff',
-    color: '#000000',
-    borderRadius: '15px',
-    border: '3px solid #000000'
-  }}
->
-  <h2>📷 QR SCANNER TEST</h2>
 
-    <button
-      onClick={() => setShowScanner(true)}
-  <button
-    onClick={() => setShowScanner(true)}
-  >
-    📷 Scan Card QR Code
-  </button>
-
-  {showScanner && (
     <div
       style={{
-        marginTop: '20px'
+        backgroundColor: '#fff3cd',
+        color: '#000',
+        padding: '15px',
+        borderRadius: '12px',
+        marginTop: '10px',
+        marginBottom: '15px',
+        border: '2px solid #ffc107'
       }}
->
-      📷 Scan Card QR Code
-    </button>
-      <h3>📷 Camera Scanner</h3>
+    >
 
-    {showScanner && (
-<div
-        id="qr-reader"
-style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: 'white',
-          color: 'black',
-          borderRadius: '15px',
-          border: '3px solid black'
-          width: '100%',
-          maxWidth: '500px',
-          margin: 'auto'
-}}
-      ></div>
+      <h3>
+        🎮 Game ID
+      </h3>
+
+      <h2>
+        {gameId}
+      </h2>
+
+      <p>
+        ⚠️ Keep this Game ID as a backup.
+      </p>
 
       <button
-        onClick={() => setShowScanner(false)}
->
-        <h2>📷 Scan Physical Card</h2>
+        onClick={() => {
+          navigator.clipboard.writeText(
+            gameId
+          )
+
+          alert(
+            `✅ Game ID copied!\n\n` +
+            `${gameId}\n\n` +
+            `Keep it somewhere safe.`
+          )
+        }}
+      >
+        📋 Copy Game ID
+      </button>
+
+    </div>
+
+    <p>
+      ⭐ Points:{' '}
+
+      {pointMode === 'group'
+        ? playerData.reduce(
+            (total, player) =>
+              total + player.points,
+            0
+          )
+        : currentPlayerInfo?.points || 0}
+    </p>
+
+    <hr />
+
+    <h3>
+      Your current board position:
+    </h3>
+
+    <h1>
+      {position}
+    </h1>
+
+    <h2>
+      {currentSpace.name}
+    </h2>
+
+    {currentSpace.type ? (
+
+      <>
 
         <p>
-          Point your camera at the QR code
-          on the physical card.
+          🎴 Card Type:{' '}
+          {currentSpace.type}
         </p>
 
         <div
-          id="qr-reader"
           style={{
-            width: '100%',
-            maxWidth: '500px',
-            margin: 'auto'
+            marginTop: '20px',
+            padding: '20px',
+            backgroundColor: '#ffffff',
+            color: '#000000',
+            borderRadius: '15px',
+            border: '3px solid #000000'
           }}
-        ></div>
-
-        <button
-          onClick={() => setShowScanner(false)}
         >
-          ❌ Close Scanner
-        </button>
-      </div>
+
+          <h2>
+            📷 QR SCANNER
+          </h2>
+
+          {!showScanner && (
+
+            <button
+              onClick={() =>
+                setShowScanner(true)
+              }
+            >
+              📷 Scan Card QR Code
+            </button>
+
+          )}
+
+          {showScanner && (
+
+            <div
+              style={{
+                marginTop: '20px',
+                padding: '15px',
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '15px',
+                border: '3px solid black',
+                width: '100%',
+                maxWidth: '500px',
+                margin: '20px auto'
+              }}
+            >
+
+              <h2>
+                📷 Scan Physical Card
+              </h2>
+
+              <p>
+                Point your camera at the QR
+                code on the physical card.
+              </p>
+
+              <div
+                id="qr-reader"
+                style={{
+                  width: '100%',
+                  maxWidth: '500px',
+                  margin: 'auto'
+                }}
+              ></div>
+
+              <button
+                onClick={() =>
+                  setShowScanner(false)
+                }
+              >
+                ❌ Close Scanner
+              </button>
+
+            </div>
+
+          )}
+
+        </div>
+
+      </>
+
+    ) : (
+
+      <p>
+        🏨 This is a hotel space.
+      </p>
+
     )}
-  </>
-) : (
-  <p>
-    🏨 This is a hotel space.
-  </p>
-)}
-        ❌ Close Scanner
-      </button>
-    </div>
-  )}
-</div>
 
-<hr />
+    <hr />
 
-</div>
+  </div>
+
 </div>
 )
 }
