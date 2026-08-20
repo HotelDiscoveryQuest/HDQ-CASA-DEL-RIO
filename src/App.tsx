@@ -1031,56 +1031,51 @@ useEffect(() => {
     'QR SCANNED:',
     decodedText
   )
-      /*
-      =========================================
-      GET CARD ID
-      =========================================
-      */
+     /*
+=========================================
+GET CARD ID
+=========================================
+*/
 
-      let cardId: string | null = null
+let cardId: string | null = null
 
-      /*
-      =========================================
-      FORMAT 1
-      HDQ:A1
-      HDQ:G1
-      HDQ:D1
-      HDQ:C1
-      HDQ:P1
-      =========================================
-      */
+const scannedText =
+  decodedText
+    .trim()
+    .toUpperCase()
 
-      const scannedText =
-        decodedText
-          .trim()
-          .toUpperCase()
+console.log(
+  'RAW QR CONTENT:',
+  decodedText
+)
 
-      if (
-        scannedText.startsWith('HDQ:')
-      ) {
+/*
+=========================================
+FORMAT 1
+HDQ:A1
+=========================================
+*/
 
-        cardId =
-          scannedText.substring(4)
-      }
+if (
+  scannedText.startsWith('HDQ:')
+) {
+  cardId =
+    scannedText
+      .substring(4)
+      .trim()
+}
 
-      /*
-      =========================================
-      FORMAT 2
-      FULL URL
+/*
+=========================================
+FORMAT 2
+FULL WEBSITE URL
+=========================================
+*/
 
-      Example:
-      https://yourwebsite.com/?card=A1
-      =========================================
-      */
-
-     if (!cardId) {
-
+if (!cardId) {
   try {
-
     const url =
-      new URL(
-        decodedText.trim()
-      )
+      new URL(decodedText.trim())
 
     const value =
       url.searchParams
@@ -1091,7 +1086,6 @@ useEffect(() => {
     if (value) {
       cardId = value
     }
-
   } catch {
     // Not a URL
   }
@@ -1100,85 +1094,63 @@ useEffect(() => {
 /*
 =========================================
 FORMAT 3
-RAW CARD ID
-
-Examples:
-A1
-A2
-G1
-D1
-C1
-P1
+DIRECT CARD ID
+A1 / G1 / D1 / C1 / P1
 =========================================
 */
 
 if (!cardId) {
+  const directMatch =
+    scannedText.match(
+      /^(A|G|D|C|P)\d+$/
+    )
 
-  const rawCard =
-    decodedText
-      .trim()
-      .toUpperCase()
-
-  if (
-    /^(A|G|D|C|P)(\d+)$/.test(rawCard)
-  ) {
-    cardId = rawCard
+  if (directMatch) {
+    cardId = scannedText
   }
 }
-      /*
-      =========================================
-      CHECK CARD ID
-      =========================================
-      */
 
-      if (!cardId) {
+/*
+=========================================
+CHECK CARD ID
+=========================================
+*/
 
-        alert(
-          `❌ Invalid Hotel Discovery Quest QR.\n\n` +
-          `Scanned:\n${decodedText}`
-        )
+if (!cardId) {
+  alert(
+    `❌ Invalid Hotel Discovery Quest QR.\n\n` +
+    `QR content:\n${decodedText}`
+  )
 
-        return
-      }
+  return
+}
 
-      /*
-      =========================================
-      CHECK CARD FORMAT
-      =========================================
+console.log(
+  'CARD ID:',
+  cardId
+)
 
-      A = Attraction
-      G = Challenge
-      D = Discovery
-      C = Chance
-      P = Penalty
+/*
+=========================================
+CHECK CARD FORMAT
+=========================================
+*/
 
-      Examples:
-      A1
-      A2
-      G1
-      D1
-      C1
-      P1
-      =========================================
-      */
+const match =
+  cardId.match(
+    /^(A|G|D|C|P)(\d+)$/
+  )
 
-      const match =
-        cardId.match(
-          /^(A|G|D|C|P)(\d+)$/
-        )
+if (!match) {
+  alert(
+    `❌ Invalid card number.\n\n` +
+    `Card detected:\n${cardId}\n\n` +
+    `Valid examples:\n` +
+    `A1, A2, G1, D1, C1, P1`
+  )
 
-      if (!match) {
-
-        alert(
-          `❌ Invalid card number.\n\n` +
-          `Scanned card: ${cardId}\n\n` +
-          `Example valid cards:\n` +
-          `A1, A2, G1, D1, C1, P1`
-        )
-
-        return
-      }
-
+  return
+}
       /*
       =========================================
       GET CARD TYPE
